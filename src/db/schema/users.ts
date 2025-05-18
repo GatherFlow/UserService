@@ -1,7 +1,13 @@
-import { pgTable, varchar } from 'drizzle-orm/pg-core'
+import { date, pgEnum, pgTable, text, varchar } from 'drizzle-orm/pg-core'
 import { baseTableAttrs } from '../utils.js'
+import { sql } from 'drizzle-orm'
+
+export const roleEnum = pgEnum('role', ['user', 'admin'])
 
 export const userTable = pgTable('user', {
 	...baseTableAttrs,
-	name: varchar().unique().notNull(),
+	firstName: varchar().unique().notNull(),
+	lastName: varchar().unique().notNull(),
+	avatar: text().notNull(),
+	dateOfBirth: date({ mode: 'date' }).default(sql`NULL`),
 })

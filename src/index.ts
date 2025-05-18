@@ -17,3 +17,17 @@ const bootstrap = async () => {
 }
 
 void bootstrap()
+
+declare global {
+	// eslint-disable-next-line @typescript-eslint/no-namespace
+	namespace NodeJS {
+		interface Global {
+			i18n: import('i18next').i18n
+		}
+	}
+
+	let i18n: import('i18next').i18n
+	interface Global {
+		i18n: import('i18next').i18n
+	}
+}

@@ -16,6 +16,8 @@ import {
 	type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 import { getRoutes } from './modules/index.js'
+import { plugin } from 'i18next-http-middleware'
+import i18n from './infrastructure/i18n.js'
 
 export class App {
 	private readonly app: AppInstance
@@ -68,7 +70,7 @@ export class App {
 		})
 
 		await this.app.register(fastifySwaggerUi, {
-			routePrefix: '/api', // TODO: change to your prefix
+			routePrefix: '/api',
 		})
 
 		await this.app.register(fastifyAwilixPlugin, {
@@ -89,6 +91,10 @@ export class App {
 			ban: 150,
 			timeWindow: 15 * 1000,
 			allowList: ['127.0.0.1'],
+		})
+
+		this.app.register(plugin, {
+			i18next: i18n,
 		})
 
 		registerDependencies(diContainer, { app: this.app })

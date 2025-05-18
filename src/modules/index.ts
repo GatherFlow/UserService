@@ -9,11 +9,11 @@ export const getRoutes = (): Routes => {
 			{
 				method: 'GET',
 				url: '/health',
-				handler: (_, reply) => {
+				handler: (request, reply) => {
 					const data = {
 						uptime: process.uptime(),
-						message: 'Healthy!',
-						data: new Date(),
+						message: request.i18n.t('status'),
+						date: new Date(),
 					}
 
 					return reply.status(200).send(data)

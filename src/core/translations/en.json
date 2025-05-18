@@ -1,0 +1,6 @@
+{
+	"status": "Healthy!",
+	"errors": {
+		"too-many-requests": "Too Many Requests"
+	}
+}

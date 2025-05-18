@@ -1,7 +1,10 @@
-import { integer, timestamp, varchar } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
+import { timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 
 const baseTableAttrs = {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
+	id: uuid()
+		.primaryKey()
+		.default(sql`uuid_generate_v7()`),
 	createdAt: timestamp({ withTimezone: true, mode: 'date' })
 		.notNull()
 		.defaultNow(),

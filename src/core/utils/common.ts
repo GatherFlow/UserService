@@ -1,8 +1,6 @@
 import type { FastifyReply } from 'fastify'
-import type { HttpError } from '../types/index.js'
+import type { ProblemDetails } from '../lib/problem.js'
 
-export const throwHttpError = (reply: FastifyReply, error: HttpError) => {
-	const { status, message } = error
-
-	return reply.status(status).send({ message })
+export const throwHttpError = (reply: FastifyReply, error: ProblemDetails) => {
+	return reply.status(error.status).send(error)
 }

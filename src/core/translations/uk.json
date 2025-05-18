@@ -1,0 +1,6 @@
+{
+	"status": "В нормі!",
+	"errors": {
+		"too-many-requests": "Забагато запитів"
+	}
+}

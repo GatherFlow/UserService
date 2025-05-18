@@ -1,18 +1,4 @@
-# Awesome Node.js backend starter
-
-> [!NOTE]  
-> The template will be updated over the time
-
-## Description
-
-`awesome-backend-starter` provides a powerful starter template for Node.js backend services.
-
-It comes with:
-
-- [fastify](https://fastify.dev/);
-- Modular structure;
-- Dependency injection (via [awilix](https://github.com/jeffijoe/awilix));
-- Powerful error-handling capabilities using Rust-inspired result container.
+# GatherFlow Users Microservice
 
 ## Getting started
 
@@ -85,7 +71,3 @@ node --run db:drop-migration
 ## Stay in touch
 
 Author - [Kyrylo Savieliev](https://github.com/OneLiL05)
-
-## License
-
-`awesome-backend-starter` is [MIT licensed](https://github.com/OneLiL05/awesome-backend-starter/blob/main/LICENSE)

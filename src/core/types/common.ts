@@ -7,9 +7,6 @@ type AppInstance = FastifyInstance<
 	http.ServerResponse
 >
 
-interface HttpError {
-	status: number
-	message: string
-}
+type Maybe<T> = T | undefined | null
 
-export type { AppInstance, HttpError }
+export type { AppInstance, Maybe }

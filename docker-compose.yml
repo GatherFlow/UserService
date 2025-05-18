@@ -4,7 +4,7 @@ networks:
     driver: bridge
 services:
   db:
-    container_name: awesome-db
+    container_name: users-db
     image: 'ghcr.io/fboulnois/pg_uuidv7:1.6.0'
     restart: always
     deploy:
@@ -13,9 +13,11 @@ services:
           cpus: '0.3'
           memory: 1.5G
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD=scram-sha-256
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -33,7 +35,7 @@ services:
         max-size: '10m'
         max-file: '3'
   bouncer:
-    container_name: identity-db-bcr
+    container_name: users-db-bcr
     image: 'bitnami/pgbouncer:latest'
     restart: unless-stopped
     environment:
@@ -62,7 +64,7 @@ services:
       db:
         condition: service_healthy
   cache:
-    container_name: identity-cache
+    container_name: users-cache
     image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
     restart: always
     deploy:
@@ -92,7 +94,7 @@ services:
         max-size: '10m'
         max-file: '3'
   api:
-    container_name: awesome-api
+    container_name: users-api
     build:
       context: .
       dockerfile: Dockerfile
@@ -107,7 +109,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=${PORT}
-      - POSTGRES_HOST=db
+      - POSTGRES_HOST=bouncer
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -117,6 +119,7 @@ services:
       - CACHE_USER=default
       - CACHE_PASSWORD=${CACHE_PASSWORD}
       - CACHE_PORT=6379
+      - BASE_URL=${BASE_URL}
     depends_on:
       db:
         condition: service_healthy

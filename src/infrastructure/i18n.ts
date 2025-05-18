@@ -1,5 +1,5 @@
-import en from '@/core/translations/en.json'
-import uk from '@/core/translations/uk.json'
+import en from '@/core/translations/en.json' with { type: 'json' }
+import uk from '@/core/translations/uk.json' with { type: 'json' }
 import i18n from 'i18next'
 import { LanguageDetector } from 'i18next-http-middleware'
 

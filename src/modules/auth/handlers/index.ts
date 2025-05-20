@@ -1,22 +1,22 @@
+import { JWT_EXPIRATION_TIME } from '@/core/constants/jwt.js'
 import {
 	InternalServerError,
 	TooManyRequestsError,
 } from '@/core/errors/index.js'
 import { Problem } from '@/core/lib/problem.js'
-import { isProduction, throwHttpError } from '@/core/utils/index.js'
+import { throwHttpError } from '@/core/utils/index.js'
+import type { CREATE_INTERNAL_USER_TYPE } from '@/modules/users/schemas/index.js'
 import type { FastifyReply, FastifyRequest } from 'fastify'
+import { EmailAlreadyUsedError } from '../errors/email-already-used.js'
 import { InvalidCredentialsError } from '../errors/invalid-credentials.js'
 import type { LOGIN_TYPE } from '../schema/index.js'
-import { JWT_COOKIE_NAME } from '@/core/constants/jwt.js'
-import type { CREATE_INTERNAL_USER_TYPE } from '@/modules/users/schemas/index.js'
-import { EmailAlreadyUsedError } from '../errors/email-already-used.js'
 
 export const login = async (
 	request: FastifyRequest<{ Body: LOGIN_TYPE }>,
 	reply: FastifyReply,
 ): Promise<void> => {
 	const { email, password } = request.body
-	const { passwordService, loginThrottler, usersRepository } =
+	const { passwordService, loginThrottler, usersRepository, cookieService } =
 		request.diScope.cradle
 
 	const user = await usersRepository.findInternalBy('email', email)
@@ -56,15 +56,9 @@ export const login = async (
 
 	const token = await reply.jwtSign({ userId: user.id })
 
-	reply
-		.setCookie(JWT_COOKIE_NAME, token, {
-			path: '/',
-			secure: isProduction() ? true : false,
-			httpOnly: true,
-			sameSite: 'lax',
-		})
-		.status(200)
-		.send('Cookie sent')
+	const expiresAt = new Date(Date.now() + JWT_EXPIRATION_TIME)
+
+	cookieService.setJwtToken(reply, token, expiresAt)
 }
 
 export const signup = async (
@@ -72,7 +66,8 @@ export const signup = async (
 	reply: FastifyReply,
 ): Promise<void> => {
 	const { email, password } = request.body
-	const { usersRepository, passwordService } = request.diScope.cradle
+	const { usersRepository, passwordService, cookieService } =
+		request.diScope.cradle
 
 	const isEmailTaken = await usersRepository.isEmailAvailable(email)
 
@@ -105,31 +100,20 @@ export const signup = async (
 
 	const token = await reply.jwtSign({ userId: user.id })
 
-	reply
-		.setCookie(JWT_COOKIE_NAME, token, {
-			path: '/',
-			secure: isProduction() ? true : false,
-			httpOnly: true,
-			sameSite: 'lax',
-		})
-		.status(200)
-		.send('Cookie sent')
+	const expiresAt = new Date(Date.now() + JWT_EXPIRATION_TIME)
+
+	cookieService.setJwtToken(reply, token, expiresAt)
 }
 
 export const logout = async (
-	_: FastifyRequest,
+	request: FastifyRequest,
 	reply: FastifyReply,
 ): Promise<void> => {
-	reply
-		.setCookie(JWT_COOKIE_NAME, '', {
-			httpOnly: true,
-			path: '/',
-			sameSite: 'lax',
-			secure: isProduction() ? true : false,
-			maxAge: 0,
-		})
-		.status(200)
-		.send('Logout completed successfully')
+	const { cookieService } = request.diScope.cradle
+
+	cookieService.deleteJwtToken(reply)
+
+	return reply.status(200).send('Logout completed successfully')
 }
 
 export const me = async (
@@ -137,6 +121,8 @@ export const me = async (
 	reply: FastifyReply,
 ): Promise<void> => {
 	const { usersRepository } = request.diScope.cradle
+
+	console.log(request.cookies)
 
 	const payload = await request.jwtVerify()
 

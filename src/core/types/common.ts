@@ -9,4 +9,8 @@ type AppInstance = FastifyInstance<
 
 type Maybe<T> = T | undefined | null
 
-export type { AppInstance, Maybe }
+interface JwtPayload {
+	userId: string
+}
+
+export type { AppInstance, Maybe, JwtPayload }

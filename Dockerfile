@@ -1,10 +1,10 @@
 ARG NODE_VERSION=22
 
-FROM node:${NODE_VERSION}-alpine as base
+FROM node:${NODE_VERSION}-alpine AS base
 
 WORKDIR /app
 
-FROM base as build
+FROM base AS build
 
 COPY --link package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 
@@ -26,6 +26,7 @@ COPY --from=build /app/node_modules /app/node_modules
 COPY --from=build /app/migrations /app/migrations
 COPY --from=build /app/package.json /app/package.json
 COPY --from=build /app/drizzle.config.ts /app/drizzle.config.ts
+COPY --from=build /app/src/secrets /app/dist/secrets
 
 EXPOSE 8080
 

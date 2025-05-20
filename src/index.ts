@@ -1,4 +1,5 @@
 import { App } from './app.js'
+import type { JWT } from '@fastify/jwt'
 
 const bootstrap = async () => {
 	const port = 8080 as const
@@ -18,16 +19,8 @@ const bootstrap = async () => {
 
 void bootstrap()
 
-declare global {
-	// eslint-disable-next-line @typescript-eslint/no-namespace
-	namespace NodeJS {
-		interface Global {
-			i18n: import('i18next').i18n
-		}
-	}
-
-	let i18n: import('i18next').i18n
-	interface Global {
-		i18n: import('i18next').i18n
+declare module 'fastify' {
+	interface FastifyRequest {
+		jwt: JWT
 	}
 }

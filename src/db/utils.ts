@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm'
-import { timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { timestamp, uuid } from 'drizzle-orm/pg-core'
 
 const baseTableAttrs = {
 	id: uuid()
@@ -12,7 +12,6 @@ const baseTableAttrs = {
 		.notNull()
 		.defaultNow()
 		.$onUpdateFn(() => new Date()),
-	name: varchar().unique().notNull(),
 }
 
 export { baseTableAttrs }

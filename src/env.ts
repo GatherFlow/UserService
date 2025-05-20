@@ -14,6 +14,8 @@ const envSchema = z.object({
 	CACHE_PASSWORD: z.string(),
 	CACHE_PORT: z.coerce.number().default(6379),
 	BASE_URL: z.string(),
+	JWT_PASSPHRASE: z.string(),
+	CORS_ORIGIN: z.string(),
 })
 
 const env = envSchema.parse(process.env)

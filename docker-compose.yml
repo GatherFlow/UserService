@@ -120,6 +120,8 @@ services:
       - CACHE_PASSWORD=${CACHE_PASSWORD}
       - CACHE_PORT=6379
       - BASE_URL=${BASE_URL}
+      - JWT_PASSPHRASE=${JWT_PASSPHRASE}
+      - CORS_ORIGIN=${CORS_ORIGIN}
     depends_on:
       db:
         condition: service_healthy
@@ -130,6 +132,15 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
+    secrets:
+      - public_key
+      - private_key
+
+secrets:
+  public_key:
+    file: ./src/secrets/public.pem
+  private_key:
+    file: ./src/secrets/private.pem
 volumes:
   pgdata:
   dragonflydata:

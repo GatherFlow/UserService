@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@fastify/awilix':
         specifier: ^7.0.0
-        version: 7.0.0(awilix@12.0.4)(fastify@5.2.1)
+        version: 7.0.0(awilix@12.0.4)(fastify@5.3.2)
       '@fastify/cookie':
         specifier: ^11.0.2
         version: 11.0.2
@@ -48,11 +48,11 @@ importers:
         specifier: 1.0.0-beta.1-c0277c0
         version: 1.0.0-beta.1-c0277c0(gel@2.0.0)(postgres@3.4.5)
       fastify:
-        specifier: ^5.2.1
-        version: 5.2.1
+        specifier: ^5.3.2
+        version: 5.3.2
       fastify-type-provider-zod:
         specifier: ^4.0.2
-        version: 4.0.2(fastify@5.2.1)(zod@3.24.2)
+        version: 4.0.2(fastify@5.3.2)(zod@3.24.2)
       i18next:
         specifier: ^25.1.3
         version: 25.1.3(typescript@5.7.3)
@@ -711,8 +711,11 @@ packages:
   '@fastify/error@4.0.0':
     resolution: {integrity: sha512-OO/SA8As24JtT1usTUTKgGH7uLvhfwZPwlptRi2Dp5P4KKmJI3gvsZ8MIHnNwDs4sLf/aai5LzTyl66xr7qMxA==}
 
-  '@fastify/fast-json-stringify-compiler@5.0.2':
-    resolution: {integrity: sha512-YdR7gqlLg1xZAQa+SX4sMNzQHY5pC54fu9oC5aYSUqBhyn6fkLkrdtKlpVdCNPlwuUuXA1PjFTEmvMF6ZVXVGw==}
+  '@fastify/error@4.1.0':
+    resolution: {integrity: sha512-KeFcciOr1eo/YvIXHP65S94jfEEqn1RxTRBT1aJaHxY5FK0/GDXYozsQMMWlZoHgi8i0s+YtrLsgj/JkUUjSkQ==}
+
+  '@fastify/fast-json-stringify-compiler@5.0.3':
+    resolution: {integrity: sha512-uik7yYHkLr6fxd8hJSZ8c+xF4WafPK+XzneQDPU+D10r5X19GW8lJcom2YijX2+qtFF1ENJlHXKFM9ouXNJYgQ==}
 
   '@fastify/forwarded@3.0.0':
     resolution: {integrity: sha512-kJExsp4JCms7ipzg7SJ3y8DwmePaELHxKYtg+tZow+k0znUTf3cb+npgyqm8+ATZOdmfgfydIebPDWM172wfyA==}
@@ -877,8 +880,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@petamoriken/float16@3.9.1':
-    resolution: {integrity: sha512-j+ejhYwY6PeB+v1kn7lZFACUIG97u90WxMuGosILFsl9d4Ovi0sjk0GlPfoEcx+FzvXZDAfioD+NGnnPamXgMA==}
+  '@petamoriken/float16@3.9.2':
+    resolution: {integrity: sha512-VgffxawQde93xKxT3qap3OH+meZf7VaSB5Sqd4Rqc+FP5alWbpOyan/7tRbOAvynjpG3GpdtAuGU/NdhQpmrog==}
 
   '@pkgr/core@0.1.1':
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
@@ -1177,6 +1180,15 @@ packages:
 
   debug@4.4.0:
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
+  debug@4.4.1:
+    resolution: {integrity: sha512-KcKCqiftBJcZr++7ykoDIEwSa3XWowTfNPo92BYxjXiyYEVrUQh2aLyhxBCwww+heortUFxEJYcRzosstTEBYQ==}
     engines: {node: '>=6.0'}
     peerDependencies:
       supports-color: '*'
@@ -1500,8 +1512,8 @@ packages:
       fastify: ^5.0.0
       zod: ^3.14.2
 
-  fastify@5.2.1:
-    resolution: {integrity: sha512-rslrNBF67eg8/Gyn7P2URV8/6pz8kSAscFL4EThZJ8JBMaXacVdVE4hmUcnPNKERl5o/xTiBSLfdowBRhVF1WA==}
+  fastify@5.3.2:
+    resolution: {integrity: sha512-AIPqBgtqBAwkOkrnwesEE+dOyU30dQ4kh7udxeGVR05CRGwubZx+p2H8P0C4cRnQT0+EPK4VGea2DTL2RtWttg==}
 
   fastparallel@2.4.1:
     resolution: {integrity: sha512-qUmhxPgNHmvRjZKBFUNI0oZuuH9OlSIOXmJ98lhKPxMZZ7zS/Fi0wRHOihDSz0R1YiIOjxzOY4bq65YTcdBi2Q==}
@@ -1520,9 +1532,9 @@ packages:
     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
     engines: {node: '>=8'}
 
-  find-my-way@9.2.0:
-    resolution: {integrity: sha512-d3uCir8Hmg7W1Ywp8nKf2lJJYU9Nwinvo+1D39Dn09nz65UKXIxUh7j7K8zeWhxqe1WrkS7FJyON/Q/3lPoc6w==}
-    engines: {node: '>=14'}
+  find-my-way@9.3.0:
+    resolution: {integrity: sha512-eRoFWQw+Yv2tuYlK2pjFS2jGXSxSppAs3hSQjfxVKxM5amECzIgYYc1FEI8ZmhSh/Ig+FrKEz43NLRKJjYCZVg==}
+    engines: {node: '>=20'}
 
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
@@ -2039,8 +2051,8 @@ packages:
   pino-std-serializers@7.0.0:
     resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
-  pino@9.6.0:
-    resolution: {integrity: sha512-i85pKRCt4qMjZ1+L7sy2Ag4t1atFcdbEt76+7iRJn1g2BvsnRMGu9p8pivl9fs63M2kF/A0OacFZhTub+m/qMg==}
+  pino@9.7.0:
+    resolution: {integrity: sha512-vnMCM6xZTb1WDmLvtG2lE/2p+t9hDEIvTWJsu6FejkE62vB7gDhvzrpFR4Cw2to+9JNQxVnkAKVPA1KPB98vWg==}
     hasBin: true
 
   postgres@3.4.5:
@@ -2062,6 +2074,9 @@ packages:
 
   process-warning@4.0.1:
     resolution: {integrity: sha512-3c2LzQ3rY9d0hc1emcsHhfT9Jwz0cChib/QN89oME2R451w5fy3f0afAhERFZAwrbDU43wk12d0ORBpDVME50Q==}
+
+  process-warning@5.0.0:
+    resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
 
   pump@3.0.2:
     resolution: {integrity: sha512-tUPXtzlGM8FE3P0ZL6DVs/3P58k9nk8/jZeQCurTJylQA8qFYzHFfhBJkuqyE0FifOsQ0uKWekiZ5g8wtr28cw==}
@@ -2134,8 +2149,8 @@ packages:
   safe-buffer@5.2.1:
     resolution: {integrity: sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==}
 
-  safe-regex2@4.0.1:
-    resolution: {integrity: sha512-goqsB+bSlOmVX+CiFX2PFc1OV88j5jvBqIM+DgqrucHnUguAUNtiNOs+aTadq2NqsLQ+TQ3UEVG3gtSFcdlkCg==}
+  safe-regex2@5.0.0:
+    resolution: {integrity: sha512-YwJwe5a51WlK7KbOJREPdjNrpViQBI3p4T50lfwPuDhZnE3XGVTlGvi+aolc5+RvxDD6bnUmjVsU9n1eboLUYw==}
 
   safe-stable-stringify@2.5.0:
     resolution: {integrity: sha512-b3rppTKm9T+PsVCBEOUR46GWI7fdOs00VKZ1+9c1EWDaDMvjQc6tUwuFyIprgGgTcWoVHSKrU8H31ZHA2e0RHA==}
@@ -2147,11 +2162,11 @@ packages:
   secure-json-parse@2.7.0:
     resolution: {integrity: sha512-6aU+Rwsezw7VR8/nyvKTx8QpWH9FrcYiXXlqC4z5d5XQBDRqtbfsRjnwGyqbi3gddNtWHuEk9OANUotL26qKUw==}
 
-  secure-json-parse@3.0.2:
-    resolution: {integrity: sha512-H6nS2o8bWfpFEV6U38sOSjS7bTbdgbCGU9wEM6W14P5H0QOsz94KCusifV44GpHDTu2nqZbuDNhTzu+mjDSw1w==}
+  secure-json-parse@4.0.0:
+    resolution: {integrity: sha512-dxtLJO6sc35jWidmLxo7ij+Eg48PM/kleBsxpC8QJE0qJICe+KawkDQmvCMZUr9u7WKVHgMW6vy3fQ7zMiFZMA==}
 
-  semver@7.7.1:
-    resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
+  semver@7.7.2:
+    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -2438,7 +2453,7 @@ snapshots:
   '@commitlint/is-ignored@19.7.1':
     dependencies:
       '@commitlint/types': 19.5.0
-      semver: 7.7.1
+      semver: 7.7.2
 
   '@commitlint/lint@19.7.1':
     dependencies:
@@ -2800,11 +2815,11 @@ snapshots:
       ajv-formats: 3.0.1(ajv@8.17.1)
       fast-uri: 3.0.6
 
-  '@fastify/awilix@7.0.0(awilix@12.0.4)(fastify@5.2.1)':
+  '@fastify/awilix@7.0.0(awilix@12.0.4)(fastify@5.3.2)':
     dependencies:
       awilix: 12.0.4
       awilix-manager: 6.1.0(awilix@12.0.4)
-      fastify: 5.2.1
+      fastify: 5.3.2
       fastify-plugin: 5.0.1
 
   '@fastify/cookie@11.0.2':
@@ -2819,7 +2834,9 @@ snapshots:
 
   '@fastify/error@4.0.0': {}
 
-  '@fastify/fast-json-stringify-compiler@5.0.2':
+  '@fastify/error@4.1.0': {}
+
+  '@fastify/fast-json-stringify-compiler@5.0.3':
     dependencies:
       fast-json-stringify: 6.0.1
 
@@ -2994,7 +3011,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@petamoriken/float16@3.9.1':
+  '@petamoriken/float16@3.9.2':
     optional: true
 
   '@pkgr/core@0.1.1': {}
@@ -3071,7 +3088,7 @@ snapshots:
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.7.1
+      semver: 7.7.2
       ts-api-utils: 2.0.1(typescript@5.7.3)
       typescript: 5.7.3
     transitivePeerDependencies:
@@ -3162,7 +3179,7 @@ snapshots:
 
   avvio@9.1.0:
     dependencies:
-      '@fastify/error': 4.0.0
+      '@fastify/error': 4.1.0
       fastq: 1.19.1
 
   awilix-manager@6.1.0(awilix@12.0.4):
@@ -3319,6 +3336,11 @@ snapshots:
   debug@4.4.0:
     dependencies:
       ms: 2.1.3
+
+  debug@4.4.1:
+    dependencies:
+      ms: 2.1.3
+    optional: true
 
   deep-is@0.1.4: {}
 
@@ -3630,29 +3652,29 @@ snapshots:
 
   fastify-plugin@5.0.1: {}
 
-  fastify-type-provider-zod@4.0.2(fastify@5.2.1)(zod@3.24.2):
+  fastify-type-provider-zod@4.0.2(fastify@5.3.2)(zod@3.24.2):
     dependencies:
       '@fastify/error': 4.0.0
-      fastify: 5.2.1
+      fastify: 5.3.2
       zod: 3.24.2
       zod-to-json-schema: 3.24.3(zod@3.24.2)
 
-  fastify@5.2.1:
+  fastify@5.3.2:
     dependencies:
       '@fastify/ajv-compiler': 4.0.2
-      '@fastify/error': 4.0.0
-      '@fastify/fast-json-stringify-compiler': 5.0.2
+      '@fastify/error': 4.1.0
+      '@fastify/fast-json-stringify-compiler': 5.0.3
       '@fastify/proxy-addr': 5.0.0
       abstract-logging: 2.0.1
       avvio: 9.1.0
       fast-json-stringify: 6.0.1
-      find-my-way: 9.2.0
+      find-my-way: 9.3.0
       light-my-request: 6.6.0
-      pino: 9.6.0
-      process-warning: 4.0.1
+      pino: 9.7.0
+      process-warning: 5.0.0
       rfdc: 1.4.1
-      secure-json-parse: 3.0.2
-      semver: 7.7.1
+      secure-json-parse: 4.0.0
+      semver: 7.7.2
       toad-cache: 3.7.0
 
   fastparallel@2.4.1:
@@ -3677,11 +3699,11 @@ snapshots:
     dependencies:
       to-regex-range: 5.0.1
 
-  find-my-way@9.2.0:
+  find-my-way@9.3.0:
     dependencies:
       fast-deep-equal: 3.1.3
       fast-querystring: 1.1.2
-      safe-regex2: 4.0.1
+      safe-regex2: 5.0.0
 
   find-up@5.0.0:
     dependencies:
@@ -3711,10 +3733,10 @@ snapshots:
 
   gel@2.0.0:
     dependencies:
-      '@petamoriken/float16': 3.9.1
-      debug: 4.4.0
+      '@petamoriken/float16': 3.9.2
+      debug: 4.4.1
       env-paths: 3.0.0
-      semver: 7.7.1
+      semver: 7.7.2
       shell-quote: 1.8.2
       which: 4.0.0
     transitivePeerDependencies:
@@ -4165,14 +4187,14 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino@9.6.0:
+  pino@9.7.0:
     dependencies:
       atomic-sleep: 1.0.0
       fast-redact: 3.5.0
       on-exit-leak-free: 2.1.2
       pino-abstract-transport: 2.0.0
       pino-std-serializers: 7.0.0
-      process-warning: 4.0.1
+      process-warning: 5.0.0
       quick-format-unescaped: 4.0.4
       real-require: 0.2.0
       safe-stable-stringify: 2.5.0
@@ -4190,6 +4212,8 @@ snapshots:
   prettier@3.5.2: {}
 
   process-warning@4.0.1: {}
+
+  process-warning@5.0.0: {}
 
   pump@3.0.2:
     dependencies:
@@ -4244,7 +4268,7 @@ snapshots:
 
   safe-buffer@5.2.1: {}
 
-  safe-regex2@4.0.1:
+  safe-regex2@5.0.0:
     dependencies:
       ret: 0.5.0
 
@@ -4254,9 +4278,9 @@ snapshots:
 
   secure-json-parse@2.7.0: {}
 
-  secure-json-parse@3.0.2: {}
+  secure-json-parse@4.0.0: {}
 
-  semver@7.7.1: {}
+  semver@7.7.2: {}
 
   set-cookie-parser@2.7.1: {}
 

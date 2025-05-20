@@ -5,6 +5,7 @@ import { diContainer, fastifyAwilixPlugin } from '@fastify/awilix'
 import fastifyCookie from '@fastify/cookie'
 import fastifyCors from '@fastify/cors'
 import fastifyHelmet from '@fastify/helmet'
+import fastifyJwt from '@fastify/jwt'
 import fastifyRateLimit from '@fastify/rate-limit'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
@@ -15,9 +16,12 @@ import {
 	validatorCompiler,
 	type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
-import { getRoutes } from './modules/index.js'
 import { plugin } from 'i18next-http-middleware'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { JWT_COOKIE_NAME, JWT_EXPIRATION_TIME } from './core/constants/index.js'
 import i18n from './infrastructure/i18n.js'
+import { getRoutes } from './modules/index.js'
 
 export class App {
 	private readonly app: AppInstance
@@ -40,8 +44,8 @@ export class App {
 		this.app.setSerializerCompiler(serializerCompiler)
 
 		await this.app.register(fastifyCors, {
-			origin: '*', // TODO: Change to your origin(s)
-			// credentials: true, // remember origin shouldn't be *, otherwise it won't work
+			origin: [env.CORS_ORIGIN],
+			credentials: true,
 			methods: ['GET', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
 		})
 
@@ -62,8 +66,8 @@ export class App {
 			}),
 			openapi: {
 				info: {
-					title: 'Awesome Backend',
-					description: 'Awesome starter template for Node.js backend',
+					title: 'GatherFlow Users Microservice',
+					description: '',
 					version: '0.0.0',
 				},
 			},
@@ -86,6 +90,38 @@ export class App {
 			hook: 'preHandler',
 		})
 
+		await this.app.register(fastifyJwt, {
+			secret: {
+				private: {
+					key: readFileSync(
+						`${join(import.meta.dirname, 'keys')}/private.pem`,
+						'utf-8',
+					),
+					passphrase: env.JWT_PASSPHRASE,
+				},
+				public: readFileSync(
+					`${join(import.meta.dirname, 'keys')}/public.pem`,
+					'utf-8',
+				),
+			},
+			cookie: {
+				signed: false,
+				cookieName: JWT_COOKIE_NAME,
+			},
+			sign: {
+				algorithm: 'RS256',
+				iss: 'gather.onelil.tech',
+				expiresIn: JWT_EXPIRATION_TIME,
+			},
+			verify: { allowedIss: 'gather.onelil.tech', algorithms: ['RS256'] },
+		})
+
+		this.app.addHook('preHandler', (request, reply, next) => {
+			request.jwt = this.app.jwt
+
+			next()
+		})
+
 		await this.app.register(fastifyRateLimit, {
 			max: 100,
 			ban: 150,
@@ -103,16 +139,9 @@ export class App {
 	private registerRoutes(): void {
 		const { routes } = getRoutes()
 
-		this.app.register(
-			(instance, _, done) => {
-				for (const route of routes) {
-					instance.withTypeProvider<ZodTypeProvider>().route(route)
-				}
-
-				done()
-			},
-			{ prefix: '/api' },
-		)
+		for (const route of routes) {
+			this.app.withTypeProvider<ZodTypeProvider>().route(route)
+		}
 	}
 
 	async initialize(): Promise<AppInstance> {

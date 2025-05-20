@@ -1,10 +1,12 @@
+import { LOGIN_SCHEMA } from '@/modules/auth/schema/index.js'
 import { z } from 'zod'
 
-const CREATE_USER_SCHEMA = z.object({
-	name: z.string().min(2).max(50),
-})
+const CREATE_INTERNAL_USER_SCHEMA = LOGIN_SCHEMA.extend({
+	firstName: z.string().min(2).max(50),
+	lastName: z.string().min(2).max(50),
+}).strict()
 
-type CREATE_USER_TYPE = z.infer<typeof CREATE_USER_SCHEMA>
+type CREATE_INTERNAL_USER_TYPE = z.infer<typeof CREATE_INTERNAL_USER_SCHEMA>
 
-export { CREATE_USER_SCHEMA }
-export type { CREATE_USER_TYPE }
+export { CREATE_INTERNAL_USER_SCHEMA }
+export type { CREATE_INTERNAL_USER_TYPE }

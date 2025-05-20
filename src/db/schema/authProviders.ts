@@ -5,6 +5,7 @@ import { userTable } from './users.js'
 export const authProviderTable = pgTable('auth_provider', {
 	id: baseTableAttrs.id,
 	createdAt: baseTableAttrs.createdAt,
+	email: varchar().notNull(),
 	provider: varchar().notNull(),
 	providerUserId: varchar().notNull(),
 	userId: uuid()

@@ -94,13 +94,13 @@ export class App {
 			secret: {
 				private: {
 					key: readFileSync(
-						`${join(import.meta.dirname, 'keys')}/private.pem`,
+						`${join(import.meta.dirname, 'secrets')}/private.pem`,
 						'utf-8',
 					),
 					passphrase: env.JWT_PASSPHRASE,
 				},
 				public: readFileSync(
-					`${join(import.meta.dirname, 'keys')}/public.pem`,
+					`${join(import.meta.dirname, 'secrets')}/public.pem`,
 					'utf-8',
 				),
 			},

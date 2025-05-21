@@ -37,9 +37,7 @@ export class Throttler<K> implements IThrottler<K> {
 				updatedAt: now,
 			} satisfies ThrottlingCounter
 
-			const a = await this.cache.hmset(_key, obj)
-
-			console.log(a)
+			await this.cache.hmset(_key, obj)
 
 			return true
 		}

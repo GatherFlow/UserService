@@ -71,7 +71,7 @@ export const signup = async (
 
 	const isEmailTaken = await usersRepository.isEmailAvailable(email)
 
-	if (isEmailTaken) {
+	if (!isEmailTaken) {
 		const problem = Problem.withInstance(
 			Problem.from(new EmailAlreadyUsedError(email)),
 			request.url,
@@ -121,8 +121,6 @@ export const me = async (
 	reply: FastifyReply,
 ): Promise<void> => {
 	const { usersRepository } = request.diScope.cradle
-
-	console.log(request.cookies)
 
 	const payload = await request.jwtVerify()
 

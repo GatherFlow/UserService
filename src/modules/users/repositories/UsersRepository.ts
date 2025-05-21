@@ -1,24 +1,28 @@
+import { DAY } from '@/core/constants/time.js'
+import { Result } from '@/core/lib/result.js'
 import type { Maybe } from '@/core/types/common.js'
 import type { DatabaseClient } from '@/core/types/deps.js'
+import { authProviderTable } from '@/db/schema/authProviders.js'
 import { internalCredentialTable } from '@/db/schema/internalCredentials.js'
+import { userLanguageTable } from '@/db/schema/userLanguages.js'
+import { userPrivacyTable } from '@/db/schema/userPrivacySettings.js'
 import { userTable } from '@/db/schema/users.js'
 import type {
 	InternalCredentials,
 	InternalUser,
 	PublicUser,
 	User,
+	UserLanguage,
+	UserPrivacy,
 } from '@/db/types.js'
 import { eq, getTableColumns, or } from 'drizzle-orm'
+import type { Redis } from 'ioredis'
+import type { CREATE_INTERNAL_USER_TYPE } from '../schemas/index.js'
 import type {
 	FindBy,
 	IUsersRepository,
 	UsersInjectableDependencies,
 } from '../types/index.js'
-import type { Redis } from 'ioredis'
-import { authProviderTable } from '@/db/schema/authProviders.js'
-import { DAY } from '@/core/constants/time.js'
-import { Result } from '@/core/lib/result.js'
-import type { CREATE_INTERNAL_USER_TYPE } from '../schemas/index.js'
 import { toPublicUser } from '../utils/index.js'
 
 export class UsersRepository implements IUsersRepository {
@@ -38,7 +42,32 @@ export class UsersRepository implements IUsersRepository {
 	async getCurrent(id: string): Promise<PublicUser> {
 		const user = await this.findInternalBy('id', id)
 
-		return toPublicUser(user!)
+		const language = await this.getUserLanguage(id)
+
+		return toPublicUser({ ...user!, language: language.language })
+	}
+
+	async getUserPrivacy(id: string): Promise<UserPrivacy> {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { id: privacyId, userId, ...rest } = getTableColumns(userPrivacyTable)
+
+		const privacyRows = await this.db
+			.select({ ...rest })
+			.from(userPrivacyTable)
+			.where(eq(userPrivacyTable, eq(userPrivacyTable.userId, id)))
+			.limit(1)
+
+		return privacyRows.at(0)!
+	}
+
+	async getUserLanguage(id: string): Promise<UserLanguage> {
+		const languageRows = await this.db
+			.select({ language: userLanguageTable.code })
+			.from(userLanguageTable)
+			.where(eq(userLanguageTable.userId, id))
+			.limit(1)
+
+		return languageRows.at(0)!
 	}
 
 	async findInternalBy<K extends FindBy>(
@@ -57,7 +86,6 @@ export class UsersRepository implements IUsersRepository {
 				eq(internalCredentialTable.userId, userTable.id),
 			)
 			.where(
-				// @ts-expect-error error is caused because of drizzle's typization issue
 				eq(
 					by === 'email' ? internalCredentialTable.email : userTable.id,
 					value,
@@ -101,34 +129,49 @@ export class UsersRepository implements IUsersRepository {
 		data: CREATE_INTERNAL_USER_TYPE,
 	): Promise<Result<InternalUser, null>> {
 		try {
-			const { firstName, lastName, email, password } = data
+			const { firstName, lastName, email, password, language } = data
 			const KEY = 'has-supervisor'
 
 			const hasSupervisor = await this.cache.exists(KEY)
 
-			const result = await this.db.transaction(async (tx) => {
-				const rows = await tx
-					.insert(userTable)
-					.values({
-						firstName,
-						lastName,
-						avatar: '/',
-						isVerified: false,
-						role: hasSupervisor ? 'user' : 'supervisor',
+			const result = await this.db.transaction(
+				async (tx) => {
+					const rows = await tx
+						.insert(userTable)
+						.values({
+							firstName,
+							lastName,
+							avatar: '/',
+							isVerified: false,
+							role: hasSupervisor ? 'user' : 'supervisor',
+						})
+						.returning()
+
+					const user = rows.at(0)!
+
+					const credsRows = await tx
+						.insert(internalCredentialTable)
+						.values({ userId: user.id, email, passwordHash: password })
+						.returning()
+
+					const creds = credsRows.at(0)!
+
+					await tx.insert(userPrivacyTable).values({
+						isPrivate: false,
+						hideAppreciated: false,
+						hideOwned: false,
+						hidePurchased: false,
+						userId: user.id,
 					})
-					.returning()
 
-				const user = rows.at(0)!
+					await tx
+						.insert(userLanguageTable)
+						.values({ code: language, userId: user.id })
 
-				const credsRows = await tx
-					.insert(internalCredentialTable)
-					.values({ userId: user.id, email, passwordHash: password })
-					.returning()
-
-				const creds = credsRows.at(0)!
-
-				return { ...user, email: creds.email, password: creds.passwordHash }
-			})
+					return { ...user, email: creds.email, password: creds.passwordHash }
+				},
+				{ isolationLevel: 'serializable' },
+			)
 
 			return Result.success(result)
 		} catch {

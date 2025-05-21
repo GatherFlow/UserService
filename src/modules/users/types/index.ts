@@ -5,6 +5,8 @@ import type {
 	InternalUser,
 	PublicUser,
 	User,
+	UserLanguage,
+	UserPrivacy,
 } from '@/db/types.js'
 import type { CREATE_INTERNAL_USER_TYPE } from '../schemas/index.js'
 import type { Result } from '@/core/lib/result.js'
@@ -18,6 +20,8 @@ interface IUsersRepository {
 		value: InternalCredentials[K],
 	) => Promise<Maybe<InternalUser>>
 	getCurrent: (id: string) => Promise<PublicUser>
+	getUserPrivacy: (id: string) => Promise<UserPrivacy>
+	getUserLanguage: (id: string) => Promise<UserLanguage>
 	isEmailAvailable: (email: string) => Promise<boolean>
 	createInternal: (
 		data: CREATE_INTERNAL_USER_TYPE,

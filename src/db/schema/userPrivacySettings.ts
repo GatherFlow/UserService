@@ -8,8 +8,10 @@ export const userPrivacyTable = pgTable('user_privacy_settings', {
 	hideOwned: boolean().notNull(),
 	hidePurchased: boolean().notNull(),
 	hideAppreciated: boolean().notNull(),
-	userId: uuid().references(() => userTable.id, {
-		onDelete: 'cascade',
-		onUpdate: 'cascade',
-	}),
+	userId: uuid()
+		.notNull()
+		.references(() => userTable.id, {
+			onDelete: 'cascade',
+			onUpdate: 'cascade',
+		}),
 })

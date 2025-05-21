@@ -15,6 +15,13 @@
 			"when": 1747703129095,
 			"tag": "0001_init_auth",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1747857549965,
+			"tag": "0002_fix-nullable-user-id",
+			"breakpoints": true
 		}
 	]
 }

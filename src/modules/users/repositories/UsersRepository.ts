@@ -235,4 +235,11 @@ export class UsersRepository implements IUsersRepository {
 			.set({ ...data })
 			.where(eq(userTable.id, userId))
 	}
+
+	async verify(userId: string): Promise<void> {
+		await this.db
+			.update(userTable)
+			.set({ isVerified: true })
+			.where(eq(userTable.id, userId))
+	}
 }

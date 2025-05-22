@@ -9,7 +9,10 @@ import type {
 	UserLanguage,
 	UserPrivacy,
 } from '@/db/types.js'
-import type { CREATE_INTERNAL_USER_TYPE } from '../schemas/index.js'
+import type {
+	CREATE_INTERNAL_USER_TYPE,
+	MANAGE_PRIVACY_TYPE,
+} from '../schemas/index.js'
 import type { Result } from '@/core/lib/result.js'
 
 type FindBy = 'id' | 'email'
@@ -28,6 +31,7 @@ interface IUsersRepository {
 		data: CREATE_INTERNAL_USER_TYPE,
 	) => Promise<Result<InternalUser, null>>
 	changeLanguage: (userId: string, language: Language) => Promise<void>
+	managePrivacy: (userId: string, data: MANAGE_PRIVACY_TYPE) => Promise<void>
 }
 
 interface UsersModuleDependencies {

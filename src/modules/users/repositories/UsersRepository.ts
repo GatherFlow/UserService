@@ -18,7 +18,10 @@ import type {
 } from '@/db/types.js'
 import { eq, getTableColumns, or } from 'drizzle-orm'
 import type { Redis } from 'ioredis'
-import type { CREATE_INTERNAL_USER_TYPE } from '../schemas/index.js'
+import type {
+	CREATE_INTERNAL_USER_TYPE,
+	MANAGE_PRIVACY_TYPE,
+} from '../schemas/index.js'
 import type {
 	FindBy,
 	IUsersRepository,
@@ -185,5 +188,15 @@ export class UsersRepository implements IUsersRepository {
 			.update(userLanguageTable)
 			.set({ code: language })
 			.where(eq(userLanguageTable.userId, userId))
+	}
+
+	async managePrivacy(
+		userId: string,
+		data: MANAGE_PRIVACY_TYPE,
+	): Promise<void> {
+		await this.db
+			.update(userPrivacyTable)
+			.set({ ...data })
+			.where(eq(userPrivacyTable.userId, userId))
 	}
 }

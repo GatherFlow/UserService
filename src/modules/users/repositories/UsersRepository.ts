@@ -20,6 +20,7 @@ import { eq, getTableColumns, or } from 'drizzle-orm'
 import type { Redis } from 'ioredis'
 import type {
 	CREATE_INTERNAL_USER_TYPE,
+	EDIT_USER_PROFILE_TYPE,
 	MANAGE_PRIVACY_TYPE,
 } from '../schemas/index.js'
 import type {
@@ -58,7 +59,7 @@ export class UsersRepository implements IUsersRepository {
 		const privacyRows = await this.db
 			.select({ ...rest })
 			.from(userPrivacyTable)
-			.where(eq(userPrivacyTable, eq(userPrivacyTable.userId, id)))
+			.where(eq(userPrivacyTable.userId, id))
 			.limit(1)
 
 		return privacyRows.at(0)!
@@ -129,6 +130,26 @@ export class UsersRepository implements IUsersRepository {
 		return result.length === 0
 	}
 
+	async isUsernameAvailable(username: string): Promise<boolean> {
+		const KEY = `username:${username}`
+
+		const isCached = await this.cache.exists(KEY)
+
+		if (isCached) {
+			return false
+		}
+
+		const result = await this.db
+			.select({ id: userTable.id })
+			.from(userTable)
+			.where(eq(userTable.username, username))
+			.limit(1)
+
+		await this.cache.setex(KEY, 7 * DAY, 'taken')
+
+		return result.length === 0
+	}
+
 	async createInternal(
 		data: CREATE_INTERNAL_USER_TYPE,
 	): Promise<Result<InternalUser, null>> {
@@ -180,6 +201,8 @@ export class UsersRepository implements IUsersRepository {
 				{ isolationLevel: 'serializable' },
 			)
 
+			await this.cache.setex(`username:${username}`, 7 * DAY, 'taken')
+
 			return Result.success(result)
 		} catch {
 			return Result.fail(null)
@@ -201,5 +224,15 @@ export class UsersRepository implements IUsersRepository {
 			.update(userPrivacyTable)
 			.set({ ...data })
 			.where(eq(userPrivacyTable.userId, userId))
+	}
+
+	async editProfile(
+		userId: string,
+		data: EDIT_USER_PROFILE_TYPE,
+	): Promise<void> {
+		await this.db
+			.update(userTable)
+			.set({ ...data })
+			.where(eq(userTable.id, userId))
 	}
 }

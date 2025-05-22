@@ -30,13 +30,24 @@ const MANAGE_PRIVACY_SCHEMA = z
 
 type MANAGE_PRIVACY_TYPE = z.infer<typeof MANAGE_PRIVACY_SCHEMA>
 
+const EDIT_USER_PROFILE_SCHEMA = z.object({
+	username: z.string().min(2).max(50),
+	firstName: z.string().min(2).max(50),
+	lastName: z.string().min(2).max(50),
+	bio: z.string().optional(),
+})
+
+type EDIT_USER_PROFILE_TYPE = z.infer<typeof EDIT_USER_PROFILE_SCHEMA>
+
 export {
 	CREATE_INTERNAL_USER_SCHEMA,
 	CHANGE_LANGUAGE_SCHEMA,
 	MANAGE_PRIVACY_SCHEMA,
+	EDIT_USER_PROFILE_SCHEMA,
 }
 export type {
 	CREATE_INTERNAL_USER_TYPE,
 	CHANGE_LANGUAGE_TYPE,
 	MANAGE_PRIVACY_TYPE,
+	EDIT_USER_PROFILE_TYPE,
 }

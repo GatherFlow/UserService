@@ -10,6 +10,7 @@ import { userTable } from '@/db/schema/users.js'
 import type {
 	InternalCredentials,
 	InternalUser,
+	Language,
 	PublicUser,
 	User,
 	UserLanguage,
@@ -39,12 +40,12 @@ export class UsersRepository implements IUsersRepository {
 	}
 
 	// TODO: Refactor to accept third-party users
-	async getCurrent(id: string): Promise<PublicUser> {
+	async getCurrent(id: string): Promise<Maybe<PublicUser>> {
 		const user = await this.findInternalBy('id', id)
 
 		const language = await this.getUserLanguage(id)
 
-		return toPublicUser({ ...user!, language: language.language })
+		return user ? toPublicUser({ ...user, language: language.language }) : null
 	}
 
 	async getUserPrivacy(id: string): Promise<UserPrivacy> {
@@ -177,5 +178,12 @@ export class UsersRepository implements IUsersRepository {
 		} catch {
 			return Result.fail(null)
 		}
+	}
+
+	async changeLanguage(userId: string, language: Language): Promise<void> {
+		await this.db
+			.update(userLanguageTable)
+			.set({ code: language })
+			.where(eq(userLanguageTable.userId, userId))
 	}
 }

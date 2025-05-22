@@ -1,5 +1,6 @@
 import { App } from './app.js'
 import type { JWT } from '@fastify/jwt'
+import type { PublicUser } from './db/types.js'
 
 const bootstrap = async () => {
 	const port = 8080 as const
@@ -22,5 +23,11 @@ void bootstrap()
 declare module 'fastify' {
 	interface FastifyRequest {
 		jwt: JWT
+	}
+}
+
+declare module '@fastify/jwt' {
+	interface FastifyJWT {
+		user: PublicUser
 	}
 }

@@ -1,5 +1,5 @@
 import type { Routes } from '@/core/types/routes.js'
-import { getUsers } from '../handlers/index.js'
+import { changeUserLanguage, getUsers } from '../handlers/index.js'
 
 export const getUsersRoutes = (): Routes => ({
 	routes: [
@@ -7,6 +7,11 @@ export const getUsersRoutes = (): Routes => ({
 			method: 'GET',
 			url: '/users',
 			handler: getUsers,
+		},
+		{
+			method: 'PUT',
+			url: '/users/language',
+			handler: changeUserLanguage,
 		},
 	],
 })

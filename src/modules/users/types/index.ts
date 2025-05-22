@@ -3,6 +3,7 @@ import type { BaseDiConfig, InjectableDependencies } from '@/core/types/deps.js'
 import type {
 	InternalCredentials,
 	InternalUser,
+	Language,
 	PublicUser,
 	User,
 	UserLanguage,
@@ -19,13 +20,14 @@ interface IUsersRepository {
 		by: K,
 		value: InternalCredentials[K],
 	) => Promise<Maybe<InternalUser>>
-	getCurrent: (id: string) => Promise<PublicUser>
+	getCurrent: (id: string) => Promise<Maybe<PublicUser>>
 	getUserPrivacy: (id: string) => Promise<UserPrivacy>
 	getUserLanguage: (id: string) => Promise<UserLanguage>
 	isEmailAvailable: (email: string) => Promise<boolean>
 	createInternal: (
 		data: CREATE_INTERNAL_USER_TYPE,
 	) => Promise<Result<InternalUser, null>>
+	changeLanguage: (userId: string, language: Language) => Promise<void>
 }
 
 interface UsersModuleDependencies {

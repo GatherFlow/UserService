@@ -136,6 +136,8 @@ export class UsersRepository implements IUsersRepository {
 			const { firstName, lastName, email, password, language } = data
 			const KEY = 'has-supervisor'
 
+			const username = email.split('@')[0]!
+
 			const hasSupervisor = await this.cache.exists(KEY)
 
 			const result = await this.db.transaction(
@@ -143,10 +145,11 @@ export class UsersRepository implements IUsersRepository {
 					const rows = await tx
 						.insert(userTable)
 						.values({
+							username,
 							firstName,
 							lastName,
 							avatar: '/',
-							isVerified: false,
+							isVerified: hasSupervisor ? false : true,
 							role: hasSupervisor ? 'user' : 'supervisor',
 						})
 						.returning()

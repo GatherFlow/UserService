@@ -1,1 +1,0 @@
-ALTER TABLE "user_privacy_settings" ALTER COLUMN "user_id" SET NOT NULL;

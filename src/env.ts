@@ -16,6 +16,7 @@ const envSchema = z.object({
 	BASE_URL: z.string(),
 	JWT_PASSPHRASE: z.string(),
 	CORS_ORIGIN: z.string(),
+	RESEND_API_KEY: z.string(),
 })
 
 const env = envSchema.parse(process.env)

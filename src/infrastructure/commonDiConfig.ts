@@ -8,6 +8,7 @@ import postgres from 'postgres'
 import { getConfig } from './config.js'
 import { Redis } from 'ioredis'
 import { relations } from '@/db/relations.js'
+import { Resend } from 'resend'
 
 export const resolveCommonDiConfig = (
 	dependencies: ExternalDependencies,
@@ -58,6 +59,11 @@ export const resolveCommonDiConfig = (
 			},
 		},
 	).singleton(),
+	mailer: asFunction(({ config }: CommonDependencies) => {
+		const mailer = new Resend(config.mailer.apiKey)
+
+		return mailer
+	}),
 	logger: asFunction(() => dependencies.app.log).singleton(),
 	config: asFunction(() => getConfig()).singleton(),
 })

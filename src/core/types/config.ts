@@ -13,9 +13,14 @@ interface CacheConfig {
 	password: string
 }
 
+interface MailerConfig {
+	apiKey: string
+}
+
 interface Config {
 	db: DbConfig
 	cache: CacheConfig
+	mailer: MailerConfig
 }
 
-export type { Config, DbConfig, CacheConfig }
+export type { Config, DbConfig, CacheConfig, MailerConfig }

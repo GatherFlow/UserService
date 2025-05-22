@@ -7,6 +7,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import type { Redis } from 'ioredis'
 import type { ExtractTablesFromSchema, Relations } from 'drizzle-orm'
 import * as schema from '@/db/schema/index.js'
+import { Resend } from 'resend'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BaseDiConfig<T> = Record<keyof T, Resolver<any>>
@@ -23,6 +24,7 @@ interface CommonDependencies {
 		client: DatabaseClient
 	}
 	cache: Redis
+	mailer: Resend
 	logger: FastifyBaseLogger
 }
 

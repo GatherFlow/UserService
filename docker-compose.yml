@@ -122,6 +122,7 @@ services:
       - BASE_URL=${BASE_URL}
       - JWT_PASSPHRASE=${JWT_PASSPHRASE}
       - CORS_ORIGIN=${CORS_ORIGIN}
+      - RESEND_API_KEY=${RESEND_API_KEY}
     depends_on:
       db:
         condition: service_healthy

@@ -1,5 +1,16 @@
 import type { Routes } from '@/core/types/routes.js'
-import { getUsers } from '../handlers/index.js'
+import {
+	changeUserLanguage,
+	editUserProfile,
+	getUserPrivacy,
+	getUsers,
+	manageUserPrivacy,
+} from '../handlers/index.js'
+import {
+	CHANGE_LANGUAGE_SCHEMA,
+	EDIT_USER_PROFILE_SCHEMA,
+	MANAGE_PRIVACY_SCHEMA,
+} from '../schemas/index.js'
 
 export const getUsersRoutes = (): Routes => ({
 	routes: [
@@ -7,6 +18,35 @@ export const getUsersRoutes = (): Routes => ({
 			method: 'GET',
 			url: '/users',
 			handler: getUsers,
+		},
+		{
+			method: 'PUT',
+			url: '/users/language',
+			handler: changeUserLanguage,
+			schema: {
+				body: CHANGE_LANGUAGE_SCHEMA,
+			},
+		},
+		{
+			method: 'GET',
+			url: '/users/privacy',
+			handler: getUserPrivacy,
+		},
+		{
+			method: 'PUT',
+			url: '/users/privacy',
+			handler: manageUserPrivacy,
+			schema: {
+				body: MANAGE_PRIVACY_SCHEMA,
+			},
+		},
+		{
+			method: 'PUT',
+			url: '/users/profile',
+			handler: editUserProfile,
+			schema: {
+				body: EDIT_USER_PROFILE_SCHEMA,
+			},
 		},
 	],
 })

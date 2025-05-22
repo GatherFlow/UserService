@@ -5,15 +5,8 @@
 		{
 			"idx": 0,
 			"version": "7",
-			"when": 1747584254958,
-			"tag": "0000_fancy_molly_hayes",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "7",
-			"when": 1747703129095,
-			"tag": "0001_init_auth",
+			"when": 1747919431314,
+			"tag": "0000_init",
 			"breakpoints": true
 		}
 	]

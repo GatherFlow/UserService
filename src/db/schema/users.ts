@@ -13,8 +13,10 @@ export const roleEnum = pgEnum('role', ['user', 'admin', 'supervisor'])
 
 export const userTable = pgTable('user', {
 	...baseTableAttrs,
-	firstName: varchar().unique().notNull(),
-	lastName: varchar().unique().notNull(),
+	username: varchar().unique().notNull(),
+	firstName: varchar().notNull(),
+	lastName: varchar().notNull(),
+	bio: text().default(sql`NULL`),
 	avatar: text().notNull(),
 	role: roleEnum().notNull(),
 	isVerified: boolean().notNull(),

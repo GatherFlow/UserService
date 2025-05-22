@@ -10,6 +10,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import { EmailAlreadyUsedError } from '../errors/email-already-used.js'
 import { InvalidCredentialsError } from '../errors/invalid-credentials.js'
 import type { LOGIN_TYPE } from '../schema/index.js'
+import { protectedRoute } from '@/core/guards/index.js'
 
 export const login = async (
 	request: FastifyRequest<{ Body: LOGIN_TYPE }>,
@@ -71,7 +72,7 @@ export const signup = async (
 
 	const isEmailTaken = await usersRepository.isEmailAvailable(email)
 
-	if (isEmailTaken) {
+	if (!isEmailTaken) {
 		const problem = Problem.withInstance(
 			Problem.from(new EmailAlreadyUsedError(email)),
 			request.url,
@@ -116,18 +117,6 @@ export const logout = async (
 	return reply.status(200).send('Logout completed successfully')
 }
 
-export const me = async (
-	request: FastifyRequest,
-	reply: FastifyReply,
-): Promise<void> => {
-	const { usersRepository } = request.diScope.cradle
-
-	console.log(request.cookies)
-
-	const payload = await request.jwtVerify()
-
-	// @ts-expect-error payload object doesn't have typization
-	const user = await usersRepository.getCurrent(payload.userId)
-
-	reply.status(200).send(user)
-}
+export const me = protectedRoute(async (request, reply) => {
+	return reply.status(200).send(request.user)
+})

@@ -3,10 +3,17 @@ import type { BaseDiConfig, InjectableDependencies } from '@/core/types/deps.js'
 import type {
 	InternalCredentials,
 	InternalUser,
+	Language,
 	PublicUser,
 	User,
+	UserLanguage,
+	UserPrivacy,
 } from '@/db/types.js'
-import type { CREATE_INTERNAL_USER_TYPE } from '../schemas/index.js'
+import type {
+	CREATE_INTERNAL_USER_TYPE,
+	EDIT_USER_PROFILE_TYPE,
+	MANAGE_PRIVACY_TYPE,
+} from '../schemas/index.js'
 import type { Result } from '@/core/lib/result.js'
 
 type FindBy = 'id' | 'email'
@@ -17,11 +24,17 @@ interface IUsersRepository {
 		by: K,
 		value: InternalCredentials[K],
 	) => Promise<Maybe<InternalUser>>
-	getCurrent: (id: string) => Promise<PublicUser>
+	getCurrent: (id: string) => Promise<Maybe<PublicUser>>
+	getUserPrivacy: (id: string) => Promise<UserPrivacy>
+	getUserLanguage: (id: string) => Promise<UserLanguage>
 	isEmailAvailable: (email: string) => Promise<boolean>
+	isUsernameAvailable: (username: string) => Promise<boolean>
 	createInternal: (
 		data: CREATE_INTERNAL_USER_TYPE,
 	) => Promise<Result<InternalUser, null>>
+	changeLanguage: (userId: string, language: Language) => Promise<void>
+	managePrivacy: (userId: string, data: MANAGE_PRIVACY_TYPE) => Promise<void>
+	editProfile: (userId: string, data: EDIT_USER_PROFILE_TYPE) => Promise<void>
 }
 
 interface UsersModuleDependencies {

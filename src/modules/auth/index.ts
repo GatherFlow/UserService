@@ -5,6 +5,7 @@ import type { CommonDependencies } from '@/core/types/deps.js'
 import { Throttler } from '@/core/lib/throttler.js'
 import { LOGIN_THROTTLER_KEY } from './constants/index.js'
 import { CookieService } from './services/CookieService.js'
+import { EmailVerificationService } from './services/EmailVerificationService.js'
 
 export const resolveAuthModule = (): AuthDiConfig => ({
 	cookieService: asClass(CookieService).singleton(),
@@ -14,4 +15,5 @@ export const resolveAuthModule = (): AuthDiConfig => ({
 
 		return throttler
 	}).singleton(),
+	emailVerificationService: asClass(EmailVerificationService).singleton(),
 })

@@ -201,6 +201,10 @@ export class UsersRepository implements IUsersRepository {
 				{ isolationLevel: 'serializable' },
 			)
 
+			if (!hasSupervisor) {
+				await this.cache.set(KEY, 'true')
+			}
+
 			await this.cache.setex(`username:${username}`, 7 * DAY, 'taken')
 
 			return Result.success(result)
@@ -233,6 +237,13 @@ export class UsersRepository implements IUsersRepository {
 		await this.db
 			.update(userTable)
 			.set({ ...data })
+			.where(eq(userTable.id, userId))
+	}
+
+	async verify(userId: string): Promise<void> {
+		await this.db
+			.update(userTable)
+			.set({ isVerified: true })
 			.where(eq(userTable.id, userId))
 	}
 }

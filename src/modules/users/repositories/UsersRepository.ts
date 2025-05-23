@@ -201,6 +201,10 @@ export class UsersRepository implements IUsersRepository {
 				{ isolationLevel: 'serializable' },
 			)
 
+			if (!hasSupervisor) {
+				await this.cache.set(KEY, 'true')
+			}
+
 			await this.cache.setex(`username:${username}`, 7 * DAY, 'taken')
 
 			return Result.success(result)

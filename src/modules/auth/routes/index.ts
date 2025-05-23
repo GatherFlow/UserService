@@ -1,6 +1,6 @@
 import type { Routes } from '@/core/types/routes.js'
-import { login, logout, me, signup } from '../handlers/index.js'
-import { LOGIN_SCHEMA } from '../schema/index.js'
+import { login, logout, me, signup, verifyEmail } from '../handlers/index.js'
+import { EMAIL_VERIFICATION_SCHEMA, LOGIN_SCHEMA } from '../schema/index.js'
 import { CREATE_INTERNAL_USER_SCHEMA } from '@/modules/users/schemas/index.js'
 
 export const getAuthRoutes = (): Routes => ({
@@ -19,6 +19,14 @@ export const getAuthRoutes = (): Routes => ({
 			handler: signup,
 			schema: {
 				body: CREATE_INTERNAL_USER_SCHEMA,
+			},
+		},
+		{
+			method: 'POST',
+			url: '/verify-email',
+			handler: verifyEmail,
+			schema: {
+				body: EMAIL_VERIFICATION_SCHEMA,
 			},
 		},
 		{

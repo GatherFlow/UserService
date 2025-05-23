@@ -107,6 +107,16 @@ export const signup = async (
 
 	const user = result.value
 
+	const token = await reply.jwtSign({ userId: user.id })
+
+	const expiresAt = new Date(Date.now() + JWT_EXPIRATION_TIME)
+
+	if (user.role === 'supervisor') {
+		cookieService.setJwtToken(reply, token, expiresAt)
+
+		return reply.status(200).send('Cookie send')
+	}
+
 	const verificationRequest = await emailVerificationService.createRequest(
 		user.id,
 	)
@@ -118,10 +128,6 @@ export const signup = async (
 		verificationRequest.token,
 		verificationRequest.expiresAt!,
 	)
-
-	const token = await reply.jwtSign({ userId: user.id })
-
-	const expiresAt = new Date(Date.now() + JWT_EXPIRATION_TIME)
 
 	cookieService.setJwtToken(reply, token, expiresAt)
 

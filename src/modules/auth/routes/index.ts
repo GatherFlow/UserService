@@ -1,5 +1,12 @@
 import type { Routes } from '@/core/types/routes.js'
-import { login, logout, me, signup, verifyEmail } from '../handlers/index.js'
+import {
+	login,
+	logout,
+	me,
+	sendVerificationEmailAgain,
+	signup,
+	verifyEmail,
+} from '../handlers/index.js'
 import { EMAIL_VERIFICATION_SCHEMA, LOGIN_SCHEMA } from '../schema/index.js'
 import { CREATE_INTERNAL_USER_SCHEMA } from '@/modules/users/schemas/index.js'
 
@@ -28,6 +35,11 @@ export const getAuthRoutes = (): Routes => ({
 			schema: {
 				body: EMAIL_VERIFICATION_SCHEMA,
 			},
+		},
+		{
+			method: 'POST',
+			url: '/resend-code',
+			handler: sendVerificationEmailAgain,
 		},
 		{
 			method: 'DELETE',

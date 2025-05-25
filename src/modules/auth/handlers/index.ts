@@ -13,6 +13,8 @@ import type { EMAIL_VERIFICATION_TYPE, LOGIN_TYPE } from '../schema/index.js'
 import { protectedRoute } from '@/core/guards/index.js'
 import { EMAIL_VERIFICATION_COOKIE } from '@/core/constants/mailer.js'
 import { IncorrectCode } from '../errors/incorrect-code.js'
+import { MissingVerificationTokenError } from '../errors/missing-verification-token.js'
+import { VerificationSessionNotFoundError } from '../errors/verification-session-not-found.js'
 
 export const login = async (
 	request: FastifyRequest<{ Body: LOGIN_TYPE }>,
@@ -158,7 +160,12 @@ export const verifyEmail = protectedRoute<{ Body: EMAIL_VERIFICATION_TYPE }>(
 		const token = request.cookies[EMAIL_VERIFICATION_COOKIE]
 
 		if (!token) {
-			return
+			const problem = Problem.withInstance(
+				Problem.from(new MissingVerificationTokenError()),
+				request.url,
+			)
+
+			return throwHttpError(reply, problem)
 		}
 
 		const verificationRequest = await emailVerificationService.getRequest(
@@ -200,5 +207,43 @@ export const verifyEmail = protectedRoute<{ Body: EMAIL_VERIFICATION_TYPE }>(
 		await emailVerificationService.deleteRequest(`${request.user.id}:${token}`)
 		await usersRepository.verify(request.user.id)
 		cookieService.deleteEmailVerificationCookie(reply)
+	},
+)
+
+export const sendVerificationEmailAgain = protectedRoute(
+	async (request, reply) => {
+		const token = request.cookies[EMAIL_VERIFICATION_COOKIE]
+
+		if (!token) {
+			const problem = Problem.withInstance(
+				Problem.from(new MissingVerificationTokenError()),
+				request.url,
+			)
+
+			return throwHttpError(reply, problem)
+		}
+
+		const { emailVerificationService } = request.diScope.cradle
+
+		const verificationRequest = await emailVerificationService.getRequest(
+			request.user.id,
+			token,
+		)
+
+		if (!verificationRequest) {
+			const problem = Problem.withInstance(
+				Problem.from(new VerificationSessionNotFoundError()),
+				request.url,
+			)
+
+			return throwHttpError(reply, problem)
+		}
+
+		await emailVerificationService.sendEmail(
+			request.user.email,
+			verificationRequest.code,
+		)
+
+		return reply.status(204).send()
 	},
 )

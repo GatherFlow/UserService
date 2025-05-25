@@ -34,6 +34,7 @@ interface IEmailVerificationService {
 	createRequest: (userId: string) => Promise<EmailVerificationRequest>
 	deleteRequest: (key: string) => Promise<void>
 	sendEmail: (email: string, code: string) => Promise<void>
+	onCooldown: (token: string, userId: string) => Promise<boolean>
 }
 
 interface AuthModuleDependencies {

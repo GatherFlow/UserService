@@ -70,6 +70,20 @@ export class EmailVerificationService implements IEmailVerificationService {
 		await this.cache.del(`${EmailVerificationService.KEY_PREFIX}:${key}`)
 	}
 
+	async onCooldown(token: string, userId: string): Promise<boolean> {
+		const KEY = `${EmailVerificationService.KEY_PREFIX}:cooldown:${userId}:${token}`
+
+		const onCooldown = await this.cache.exists(KEY)
+
+		if (onCooldown) {
+			return true
+		}
+
+		await this.cache.setex(KEY, MINUTE, '1')
+
+		return false
+	}
+
 	private generateOTP(): string {
 		const chars =
 			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'

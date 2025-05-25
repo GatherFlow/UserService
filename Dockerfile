@@ -17,9 +17,15 @@ RUN \
 
 COPY --link . .
 
-RUN chmod +x ./scripts/init-keys.sh
-
-RUN ./scripts/init-keys.sh
+RUN \
+  mkdir -p ./src/secrets && \
+  if [ -f ./src/secrets/private.pem ] || [ -f ./src/secrets/public.pem ]; then \
+    echo "One or both key files already exist, skipping write..."; \
+  else \
+    echo "$PRIVATE_KEY_B64" | base64 -d > ./src/secrets/private.pem && \
+    echo "$PUBLIC_KEY_B64" | base64 -d > ./src/secrets/public.pem; \
+  fi && \
+  chmod 600 ./src/secrets/private.pem ./src/secrets/public.pem
 
 RUN node --run build
 

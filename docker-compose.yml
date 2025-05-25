@@ -123,6 +123,10 @@ services:
       - JWT_PASSPHRASE=${JWT_PASSPHRASE}
       - CORS_ORIGIN=${CORS_ORIGIN}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - PRIVATE_KEY_B64=${PRIVATE_KEY_B64}
+      - PUBLIC_KEY_B64=${PUBLIC_KEY_B64}
+    volumes:
+      - ./src/secrets:/app/src/secrets
     depends_on:
       db:
         condition: service_healthy
@@ -133,15 +137,7 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
-    secrets:
-      - public_key
-      - private_key
 
-secrets:
-  public_key:
-    file: ./src/secrets/public.pem
-  private_key:
-    file: ./src/secrets/private.pem
 volumes:
   pgdata:
   dragonflydata:

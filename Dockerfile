@@ -1,3 +1,4 @@
+ARG SCRIPT_PATH=./scripts/init-keys.sh
 ARG NODE_VERSION=22
 
 FROM node:${NODE_VERSION}-alpine AS base
@@ -16,6 +17,10 @@ RUN \
   fi
 
 COPY --link . .
+
+RUN chmox +x ${SCRIPT_PATH}"
+
+RUN ${SCRIPT_PATH}
 
 RUN node --run build
 

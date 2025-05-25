@@ -27,10 +27,18 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.internalCredentialTable.userId,
 			optional: false,
 		}),
+		passwordResetSessions: r.many.passwordResetSessionTable(),
 	},
 	userSocialLinkTable: {
 		user: r.one.userTable({
 			from: r.userSocialLinkTable.userId,
+			to: r.userTable.id,
+			optional: false,
+		}),
+	},
+	passwordResetSessionTable: {
+		user: r.one.userTable({
+			from: r.passwordResetSessionTable.userId,
 			to: r.userTable.id,
 			optional: false,
 		}),

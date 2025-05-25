@@ -6,6 +6,7 @@ import { Throttler } from '@/core/lib/throttler.js'
 import { LOGIN_THROTTLER_KEY } from './constants/index.js'
 import { CookieService } from './services/CookieService.js'
 import { EmailVerificationService } from './services/EmailVerificationService.js'
+import { ResetPasswordService } from './services/ResetPasswordService.js'
 
 export const resolveAuthModule = (): AuthDiConfig => ({
 	cookieService: asClass(CookieService).singleton(),
@@ -16,4 +17,5 @@ export const resolveAuthModule = (): AuthDiConfig => ({
 		return throttler
 	}).singleton(),
 	emailVerificationService: asClass(EmailVerificationService).singleton(),
+	resetPasswordService: asClass(ResetPasswordService).singleton(),
 })

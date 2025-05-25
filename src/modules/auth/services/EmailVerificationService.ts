@@ -1,14 +1,15 @@
+import { EMAIL_SENDER } from '@/core/constants/mailer.js'
+import { MINUTE } from '@/core/constants/time.js'
+import type { Maybe } from '@/core/types/common.js'
 import type { Redis } from 'ioredis'
+import { randomBytes } from 'node:crypto'
+import type { Resend } from 'resend'
 import type {
 	AuthInjectableDependencies,
 	EmailVerificationRequest,
 	IEmailVerificationService,
 } from '../types/index.js'
-import { getRandomValues, randomBytes } from 'node:crypto'
-import { MINUTE } from '@/core/constants/time.js'
-import type { Resend } from 'resend'
-import { EMAIL_SENDER } from '@/core/constants/mailer.js'
-import type { Maybe } from '@/core/types/common.js'
+import { generateOTP } from '../utils/otp.js'
 
 export class EmailVerificationService implements IEmailVerificationService {
 	private static readonly KEY_PREFIX = 'email-verification'
@@ -42,7 +43,7 @@ export class EmailVerificationService implements IEmailVerificationService {
 	async createRequest(userId: string): Promise<EmailVerificationRequest> {
 		const token = randomBytes(32).toString('hex')
 		const KEY = `${EmailVerificationService.KEY_PREFIX}:${userId}:${token}`
-		const otp = this.generateOTP()
+		const otp = generateOTP()
 		const ttl = 10 * MINUTE
 
 		await this.cache.setex(KEY, ttl, otp)
@@ -82,21 +83,5 @@ export class EmailVerificationService implements IEmailVerificationService {
 		await this.cache.setex(KEY, MINUTE, '1')
 
 		return false
-	}
-
-	private generateOTP(): string {
-		const chars =
-			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-		const array = new Uint8Array(4)
-		getRandomValues(array)
-
-		let result = ''
-
-		for (let i = 0; i < 4; i++) {
-			// @ts-expect-error idk
-			result += chars[array[i] % chars.length]
-		}
-
-		return result
 	}
 }

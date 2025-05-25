@@ -1,6 +1,7 @@
 import type { IThrottler } from '@/core/lib/throttler.js'
 import type { Maybe } from '@/core/types/common.js'
 import type { BaseDiConfig, InjectableDependencies } from '@/core/types/deps.js'
+import type { PasswordResetSession } from '@/db/types.js'
 import type { FastifyReply } from 'fastify'
 
 interface EmailVerificationRequest {
@@ -24,6 +25,12 @@ interface ICookieService {
 		expiresAt: Date,
 	) => void
 	deleteEmailVerificationCookie: (reply: FastifyReply) => void
+	setPasswordResetCookie: (
+		reply: FastifyReply,
+		token: string,
+		expiresAt: Date,
+	) => void
+	deletePasswordResetCookie: (reply: FastifyReply) => void
 }
 
 interface IEmailVerificationService {
@@ -37,11 +44,23 @@ interface IEmailVerificationService {
 	onCooldown: (token: string, userId: string) => Promise<boolean>
 }
 
+interface IResetPasswordService {
+	getSession: (sessionId: string) => Promise<Maybe<PasswordResetSession>>
+	createSession: (
+		userId: string,
+		email: string,
+	) => Promise<PasswordResetSession>
+	invalidateSession: (key: string) => Promise<void>
+	sendEmail: (email: string, code: string) => Promise<void>
+	verifyEmail: (sessionId: string) => Promise<void>
+}
+
 interface AuthModuleDependencies {
 	passwordService: IPasswordService
 	cookieService: ICookieService
 	loginThrottler: IThrottler<string>
 	emailVerificationService: IEmailVerificationService
+	resetPasswordService: IResetPasswordService
 }
 
 type AuthInjectableDependencies = InjectableDependencies<AuthModuleDependencies>
@@ -55,4 +74,5 @@ export type {
 	IEmailVerificationService,
 	AuthInjectableDependencies,
 	EmailVerificationRequest,
+	IResetPasswordService,
 }

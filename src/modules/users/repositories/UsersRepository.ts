@@ -246,4 +246,11 @@ export class UsersRepository implements IUsersRepository {
 			.set({ isVerified: true })
 			.where(eq(userTable.id, userId))
 	}
+
+	async changePassword(userId: string, password: string): Promise<void> {
+		await this.db
+			.update(internalCredentialTable)
+			.set({ passwordHash: password })
+			.where(eq(internalCredentialTable.userId, userId))
+	}
 }

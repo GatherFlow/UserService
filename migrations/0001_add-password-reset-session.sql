@@ -2,6 +2,7 @@ CREATE TABLE "password-reset-session" (
 	"id" uuid PRIMARY KEY DEFAULT uuid_generate_v7() NOT NULL,
 	"expires_at" timestamp with time zone NOT NULL,
 	"email" varchar NOT NULL,
+	"code" varchar(4) NOT NULL,
 	"is_email_verified" boolean DEFAULT false NOT NULL,
 	"user_id" uuid NOT NULL
 );

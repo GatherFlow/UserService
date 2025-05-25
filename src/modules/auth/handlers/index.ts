@@ -283,7 +283,7 @@ export const requestPasswordReset = async (
 
 	cookieService.setPasswordResetCookie(reply, session.id, session.expiresAt)
 
-	return reply.status(204).send()
+	return reply.status(200).send(session)
 }
 
 export const verifyResetEmail = async (

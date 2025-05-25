@@ -66,7 +66,7 @@ export class App {
 			}),
 			openapi: {
 				info: {
-					title: 'GatherFlow Users Microservice',
+					title: 'GatherFlow Backend',
 					description: '',
 					version: '0.0.0',
 				},
@@ -74,7 +74,7 @@ export class App {
 		})
 
 		await this.app.register(fastifySwaggerUi, {
-			routePrefix: '/api',
+			routePrefix: '/',
 		})
 
 		await this.app.register(fastifyAwilixPlugin, {

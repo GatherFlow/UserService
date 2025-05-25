@@ -35,6 +35,8 @@ interface IUsersRepository {
 	changeLanguage: (userId: string, language: Language) => Promise<void>
 	managePrivacy: (userId: string, data: MANAGE_PRIVACY_TYPE) => Promise<void>
 	editProfile: (userId: string, data: EDIT_USER_PROFILE_TYPE) => Promise<void>
+	verify: (userId: string) => Promise<void>
+	changePassword: (userId: string, password: string) => Promise<void>
 }
 
 interface UsersModuleDependencies {

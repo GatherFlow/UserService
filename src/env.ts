@@ -17,6 +17,9 @@ const envSchema = z.object({
 	JWT_PASSPHRASE: z.string(),
 	CORS_ORIGIN: z.string(),
 	RESEND_API_KEY: z.string(),
+	GOOGLE_CLIENT_ID: z.string(),
+	GOOGLE_CLIENT_SECRET: z.string(),
+	GOOGLE_REDIRECT_URI: z.string(),
 })
 
 const env = envSchema.parse(process.env)

@@ -8,6 +8,7 @@ import { userLanguageTable } from '@/db/schema/userLanguages.js'
 import { userPrivacyTable } from '@/db/schema/userPrivacySettings.js'
 import { userTable } from '@/db/schema/users.js'
 import type {
+	ExternalUser,
 	InternalCredentials,
 	InternalUser,
 	Language,
@@ -19,12 +20,14 @@ import type {
 import { eq, getTableColumns, or } from 'drizzle-orm'
 import type { Redis } from 'ioredis'
 import type {
+	CREATE_EXTERNAL_USER_TYPE,
 	CREATE_INTERNAL_USER_TYPE,
 	EDIT_USER_PROFILE_TYPE,
 	MANAGE_PRIVACY_TYPE,
 } from '../schemas/index.js'
 import type {
-	FindBy,
+	ExternalFindBy,
+	InternalFindBy,
 	IUsersRepository,
 	UsersInjectableDependencies,
 } from '../types/index.js'
@@ -45,11 +48,19 @@ export class UsersRepository implements IUsersRepository {
 
 	// TODO: Refactor to accept third-party users
 	async getCurrent(id: string): Promise<Maybe<PublicUser>> {
-		const user = await this.findInternalBy('id', id)
+		const internalUser = await this.findInternalBy('id', id)
 
 		const language = await this.getUserLanguage(id)
 
-		return user ? toPublicUser({ ...user, language: language.language }) : null
+		if (!internalUser) {
+			const externalUser = await this.findExternal('id', id)
+
+			if (!externalUser) return null
+
+			return toPublicUser({ ...externalUser, language: language.language })
+		}
+
+		return toPublicUser({ ...internalUser, language: language.language })
 	}
 
 	async getUserPrivacy(id: string): Promise<UserPrivacy> {
@@ -75,7 +86,7 @@ export class UsersRepository implements IUsersRepository {
 		return languageRows.at(0)!
 	}
 
-	async findInternalBy<K extends FindBy>(
+	async findInternalBy<K extends InternalFindBy>(
 		by: K,
 		value: InternalCredentials[K],
 	): Promise<Maybe<InternalUser>> {
@@ -93,6 +104,28 @@ export class UsersRepository implements IUsersRepository {
 			.where(
 				eq(
 					by === 'email' ? internalCredentialTable.email : userTable.id,
+					value,
+				),
+			)
+
+		return user ?? null
+	}
+
+	async findExternal<K extends ExternalFindBy>(
+		by: K,
+		value: ExternalUser[K],
+	): Promise<Maybe<ExternalUser>> {
+		const [user] = await this.db
+			.select({
+				...getTableColumns(userTable),
+				email: authProviderTable.email,
+				providerId: authProviderTable.providerUserId,
+			})
+			.from(userTable)
+			.innerJoin(authProviderTable, eq(authProviderTable.userId, userTable.id))
+			.where(
+				eq(
+					by === 'providerId' ? authProviderTable.providerUserId : userTable.id,
 					value,
 				),
 			)
@@ -206,6 +239,68 @@ export class UsersRepository implements IUsersRepository {
 			}
 
 			await this.cache.setex(`username:${username}`, 7 * DAY, 'taken')
+			await this.cache.setex(`email:${email}`, 7 * DAY, 'taken')
+
+			return Result.success(result)
+		} catch {
+			return Result.fail(null)
+		}
+	}
+
+	async createExternal(
+		data: CREATE_EXTERNAL_USER_TYPE,
+	): Promise<Result<ExternalUser, null>> {
+		const { locale, firstName, lastName, email, avatar, providerId, provider } =
+			data
+		const KEY = 'has-supervisor'
+		const username = email.split('@')[0]!
+
+		const hasSupervisor = await this.cache.exists(KEY)
+
+		try {
+			const result = await this.db.transaction(async (tx) => {
+				const rows = await tx
+					.insert(userTable)
+					.values({
+						username: username,
+						firstName,
+						lastName,
+						avatar,
+						isVerified: true,
+						role: hasSupervisor ? 'user' : 'supervisor',
+					})
+					.returning()
+
+				const user = rows.at(0)!
+
+				await tx.insert(authProviderTable).values({
+					email,
+					provider,
+					providerUserId: providerId,
+					userId: user.id,
+				})
+
+				await tx.insert(userPrivacyTable).values({
+					isPrivate: false,
+					hideAppreciated: false,
+					hideOwned: false,
+					hidePurchased: false,
+					userId: user.id,
+				})
+
+				await tx
+					.insert(userLanguageTable)
+					.values({ code: locale, userId: user.id })
+
+				return { ...user, email, providerId }
+			})
+
+			if (!hasSupervisor) {
+				await this.cache.set(KEY, 'true')
+			}
+
+			await this.cache.setex(`username:${username}`, 7 * DAY, 'taken')
+			await this.cache.setex(`email:${email}`, 7 * DAY, 'taken')
 
 			return Result.success(result)
 		} catch {

@@ -9,6 +9,7 @@ import { getConfig } from './config.js'
 import { Redis } from 'ioredis'
 import { relations } from '@/db/relations.js'
 import { Resend } from 'resend'
+import { Google } from 'arctic'
 
 export const resolveCommonDiConfig = (
 	dependencies: ExternalDependencies,
@@ -63,6 +64,13 @@ export const resolveCommonDiConfig = (
 		const mailer = new Resend(config.mailer.apiKey)
 
 		return mailer
+	}),
+	googleOAuth: asFunction(({ config }: CommonDependencies) => {
+		const { clientId, clientSecret, redirectURI } = config.googleOAuth
+
+		const oathClient = new Google(clientId, clientSecret, redirectURI)
+
+		return oathClient
 	}),
 	logger: asFunction(() => dependencies.app.log).singleton(),
 	config: asFunction(() => getConfig()).singleton(),

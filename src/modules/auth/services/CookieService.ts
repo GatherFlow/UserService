@@ -1,5 +1,5 @@
 import type { FastifyReply } from 'fastify'
-import type { ICookieService } from '../types/index.js'
+import type { ICookieService, SetCookieArgs } from '../types/index.js'
 import type { CookieSerializeOptions } from '@fastify/cookie'
 import { JWT_COOKIE_NAME } from '@/core/constants/jwt.js'
 import { EMAIL_VERIFICATION_COOKIE } from '@/core/constants/mailer.js'
@@ -10,6 +10,23 @@ export class CookieService implements ICookieService {
 		httpOnly: true,
 		sameSite: 'lax',
 		path: '/',
+	}
+
+	set({ reply, name, value, expiresAt }: SetCookieArgs): void {
+		reply.setCookie(name, value, {
+			...this.SHARED_COOKIE_OPTIONS,
+			expires: expiresAt,
+			secure: process.env.NODE_ENV === 'production',
+		})
+	}
+
+	delete(reply: FastifyReply, name: string): void {
+		const cookieOptions: CookieSerializeOptions =
+			process.env.NODE_ENV === 'production'
+				? { ...this.SHARED_COOKIE_OPTIONS, maxAge: 0, secure: true }
+				: { ...this.SHARED_COOKIE_OPTIONS, maxAge: 0 }
+
+		reply.setCookie(name, '', cookieOptions)
 	}
 
 	setJwtToken(reply: FastifyReply, token: string, expiresAt: Date): void {

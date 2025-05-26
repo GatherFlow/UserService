@@ -16,7 +16,16 @@ interface IPasswordService {
 	verify: (hash: string, password: string) => Promise<boolean>
 }
 
+interface SetCookieArgs {
+	reply: FastifyReply
+	name: string
+	value: string
+	expiresAt: Date
+}
+
 interface ICookieService {
+	set: (args: SetCookieArgs) => void
+	delete: (reply: FastifyReply, name: string) => void
 	setJwtToken: (reply: FastifyReply, token: string, expiresAt: Date) => void
 	deleteJwtToken: (reply: FastifyReply) => void
 	setEmailVerificationCookie: (
@@ -75,4 +84,5 @@ export type {
 	AuthInjectableDependencies,
 	EmailVerificationRequest,
 	IResetPasswordService,
+	SetCookieArgs,
 }

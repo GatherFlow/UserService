@@ -17,10 +17,17 @@ interface MailerConfig {
 	apiKey: string
 }
 
+interface GoogleOAuthConfig {
+	clientId: string
+	clientSecret: string
+	redirectURI: string
+}
+
 interface Config {
 	db: DbConfig
 	cache: CacheConfig
 	mailer: MailerConfig
+	googleOAuth: GoogleOAuthConfig
 }
 
-export type { Config, DbConfig, CacheConfig, MailerConfig }
+export type { Config, DbConfig, CacheConfig, MailerConfig, GoogleOAuthConfig }

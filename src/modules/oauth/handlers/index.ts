@@ -12,6 +12,7 @@ import { JWT_COOKIE_NAME, JWT_EXPIRATION_TIME } from '@/core/constants/jwt.js'
 import { Problem } from '@/core/lib/problem.js'
 import { InternalServerError } from '@/core/errors/internal.js'
 import { throwHttpError } from '@/core/utils/common.js'
+import { InvalidCodeOrClientCredentialsError } from '../errors/invalid-code-or-client.js'
 
 export const googleAuthRedirect = async (
 	request: FastifyRequest,
@@ -55,7 +56,12 @@ export const validateGoogleCallback = async (
 	const codeVerifier = request.cookies[GOOGLE_OAUTH_VERIFIER_COOKIE]
 
 	if (!storedState || !codeVerifier || state !== storedState) {
-		return
+		const problem = Problem.withInstance(
+			Problem.from(new InvalidCodeOrClientCredentialsError()),
+			request.url,
+		)
+
+		return throwHttpError(reply, problem)
 	}
 
 	let tokens: OAuth2Tokens
@@ -63,7 +69,12 @@ export const validateGoogleCallback = async (
 	try {
 		tokens = await googleOAuth.validateAuthorizationCode(code, codeVerifier)
 	} catch {
-		return
+		const problem = Problem.withInstance(
+			Problem.from(new InvalidCodeOrClientCredentialsError()),
+			request.url,
+		)
+
+		return throwHttpError(reply, problem)
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

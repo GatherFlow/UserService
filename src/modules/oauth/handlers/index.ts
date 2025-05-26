@@ -81,8 +81,6 @@ export const validateGoogleCallback = async (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const claims: any = decodeIdToken(tokens.idToken())
 
-	console.log(claims)
-
 	const googleUserId = claims.sub
 	const email = claims.email
 	const firstName = claims.given_name

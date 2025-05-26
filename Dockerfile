@@ -1,10 +1,12 @@
 ARG NODE_VERSION=22
 
 FROM node:${NODE_VERSION}-alpine AS base
-
 WORKDIR /app
 
 FROM base AS build
+
+ARG PRIVATE_KEY_B64
+ARG PUBLIC_KEY_B64
 
 COPY --link package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 
@@ -16,6 +18,15 @@ RUN \
   fi
 
 COPY --link . .
+
+RUN mkdir -p ./src/secrets && \
+  if [ -f ./src/secrets/private.pem ] || [ -f ./src/secrets/public.pem ]; then \
+    echo "One or both key files already exist, skipping write..."; \
+  else \
+    echo "$PRIVATE_KEY_B64" | base64 -d > ./src/secrets/private.pem && \
+    echo "$PUBLIC_KEY_B64" | base64 -d > ./src/secrets/public.pem; \
+  fi && \
+  chmod 600 ./src/secrets/private.pem ./src/secrets/public.pem
 
 RUN node --run build
 

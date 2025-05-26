@@ -66,7 +66,7 @@ export class App {
 			}),
 			openapi: {
 				info: {
-					title: 'GatherFlow Users Microservice',
+					title: 'GatherFlow Backend',
 					description: '',
 					version: '0.0.0',
 				},
@@ -139,9 +139,16 @@ export class App {
 	private registerRoutes(): void {
 		const { routes } = getRoutes()
 
-		for (const route of routes) {
-			this.app.withTypeProvider<ZodTypeProvider>().route(route)
-		}
+		this.app.register(
+			(instance, _, done) => {
+				for (const route of routes) {
+					instance.withTypeProvider<ZodTypeProvider>().route(route)
+				}
+
+				done()
+			},
+			{ prefix: '/api' },
+		)
 	}
 
 	async initialize(): Promise<AppInstance> {

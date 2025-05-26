@@ -120,6 +120,9 @@ services:
       - JWT_PASSPHRASE=${JWT_PASSPHRASE}
       - CORS_ORIGIN=${CORS_ORIGIN}
       - RESEND_API_KEY=${RESEND_API_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
     depends_on:
       db:
         condition: service_healthy

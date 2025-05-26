@@ -15,7 +15,7 @@ interface UserLanguage {
 }
 
 type InternalUser = User & { email: string; password: string }
-type ExternalUser = User & { email: string }
+type ExternalUser = User & { email: string; providerId: string }
 
 type PublicUser = Omit<User, 'createdAt' | 'updatedAt'> & {
 	email: string

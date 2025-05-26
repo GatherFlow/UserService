@@ -1,10 +1,12 @@
 import type { Routes } from '@/core/types/routes.js'
 import { getUsersRoutes } from './users/routes/index.js'
 import { getAuthRoutes } from './auth/routes/index.js'
+import { getOAuthRoutes } from './oauth/routes/index.js'
 
 export const getRoutes = (): Routes => {
 	const { routes: usersRoutes } = getUsersRoutes()
 	const { routes: authRoutes } = getAuthRoutes()
+	const { routes: oauthRoutes } = getOAuthRoutes()
 
 	return {
 		routes: [
@@ -23,6 +25,7 @@ export const getRoutes = (): Routes => {
 			},
 			...authRoutes,
 			...usersRoutes,
+			...oauthRoutes,
 		],
 	}
 }

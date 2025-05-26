@@ -26,7 +26,8 @@ import type {
 	MANAGE_PRIVACY_TYPE,
 } from '../schemas/index.js'
 import type {
-	FindBy,
+	ExternalFindBy,
+	InternalFindBy,
 	IUsersRepository,
 	UsersInjectableDependencies,
 } from '../types/index.js'
@@ -47,11 +48,19 @@ export class UsersRepository implements IUsersRepository {
 
 	// TODO: Refactor to accept third-party users
 	async getCurrent(id: string): Promise<Maybe<PublicUser>> {
-		const user = await this.findInternalBy('id', id)
+		const internalUser = await this.findInternalBy('id', id)
 
 		const language = await this.getUserLanguage(id)
 
-		return user ? toPublicUser({ ...user, language: language.language }) : null
+		if (!internalUser) {
+			const externalUser = await this.findExternal('id', id)
+
+			if (!externalUser) return null
+
+			return toPublicUser({ ...externalUser, language: language.language })
+		}
+
+		return toPublicUser({ ...internalUser, language: language.language })
 	}
 
 	async getUserPrivacy(id: string): Promise<UserPrivacy> {
@@ -77,7 +86,7 @@ export class UsersRepository implements IUsersRepository {
 		return languageRows.at(0)!
 	}
 
-	async findInternalBy<K extends FindBy>(
+	async findInternalBy<K extends InternalFindBy>(
 		by: K,
 		value: InternalCredentials[K],
 	): Promise<Maybe<InternalUser>> {
@@ -102,15 +111,24 @@ export class UsersRepository implements IUsersRepository {
 		return user ?? null
 	}
 
-	async findExternal(providerId: string): Promise<Maybe<ExternalUser>> {
+	async findExternal<K extends ExternalFindBy>(
+		by: K,
+		value: ExternalUser[K],
+	): Promise<Maybe<ExternalUser>> {
 		const [user] = await this.db
 			.select({
 				...getTableColumns(userTable),
 				email: authProviderTable.email,
+				providerId: authProviderTable.providerUserId,
 			})
 			.from(userTable)
 			.innerJoin(authProviderTable, eq(authProviderTable.userId, userTable.id))
-			.where(eq(authProviderTable.providerUserId, providerId))
+			.where(
+				eq(
+					by === 'providerId' ? authProviderTable.providerUserId : userTable.id,
+					value,
+				),
+			)
 
 		return user ?? null
 	}
@@ -235,8 +253,6 @@ export class UsersRepository implements IUsersRepository {
 		const { locale, firstName, lastName, email, avatar, providerId, provider } =
 			data
 		const KEY = 'has-supervisor'
-
-		const language = locale.split('-')[0]!
 		const username = email.split('@')[0]!
 
 		const hasSupervisor = await this.cache.exists(KEY)
@@ -274,9 +290,9 @@ export class UsersRepository implements IUsersRepository {
 
 				await tx
 					.insert(userLanguageTable)
-					.values({ code: language, userId: user.id })
+					.values({ code: locale, userId: user.id })
 
-				return { ...user, email }
+				return { ...user, email, providerId }
 			})
 
 			if (!hasSupervisor) {

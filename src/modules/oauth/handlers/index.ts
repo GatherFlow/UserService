@@ -13,6 +13,7 @@ import { Problem } from '@/core/lib/problem.js'
 import { InternalServerError } from '@/core/errors/internal.js'
 import { throwHttpError } from '@/core/utils/common.js'
 import { InvalidCodeOrClientCredentialsError } from '../errors/invalid-code-or-client.js'
+import { env } from '@/env.js'
 
 export const googleAuthRedirect = async (
 	request: FastifyRequest,
@@ -87,9 +88,8 @@ export const validateGoogleCallback = async (
 	const firstName = claims.given_name
 	const lastName = claims.family_name
 	const avatar = claims.picture
-	const locale = claims.locale
 
-	const isExist = await usersRepository.findExternal(googleUserId)
+	const isExist = await usersRepository.findExternal('providerId', googleUserId)
 
 	if (!isExist) {
 		const result = await usersRepository.createExternal({
@@ -97,7 +97,7 @@ export const validateGoogleCallback = async (
 			email,
 			firstName,
 			lastName,
-			locale,
+			locale: 'en', // TODO: remove harcoded value
 			avatar,
 			provider: 'google',
 		})
@@ -126,5 +126,5 @@ export const validateGoogleCallback = async (
 
 	cookieService.set({ reply, name: JWT_COOKIE_NAME, value: token, expiresAt })
 
-	return reply.status(204).send()
+	return reply.redirect(`${env.CORS_ORIGIN}`)
 }

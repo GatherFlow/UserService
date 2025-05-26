@@ -5,7 +5,7 @@ import {
 } from '../handlers/index.js'
 import { VALIDATE_GOOGLE_CALLBACK_SCHEMA } from '../schemas/index.js'
 
-export const oauthRoutes = (): Routes => ({
+export const getOAuthRoutes = (): Routes => ({
 	routes: [
 		{
 			method: 'GET',

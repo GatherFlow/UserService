@@ -18,15 +18,20 @@ import type {
 } from '../schemas/index.js'
 import type { Result } from '@/core/lib/result.js'
 
-type FindBy = 'id' | 'email'
+type InternalFindBy = 'id' | 'email'
+
+type ExternalFindBy = 'id' | 'providerId'
 
 interface IUsersRepository {
 	findAll: () => Promise<User[]>
-	findInternalBy: <K extends FindBy>(
+	findInternalBy: <K extends InternalFindBy>(
 		by: K,
 		value: InternalCredentials[K],
 	) => Promise<Maybe<InternalUser>>
-	findExternal: (providerId: string) => Promise<Maybe<ExternalUser>>
+	findExternal: <K extends ExternalFindBy>(
+		by: K,
+		value: ExternalUser[K],
+	) => Promise<Maybe<ExternalUser>>
 	getCurrent: (id: string) => Promise<Maybe<PublicUser>>
 	getUserPrivacy: (id: string) => Promise<UserPrivacy>
 	getUserLanguage: (id: string) => Promise<UserLanguage>
@@ -59,5 +64,6 @@ export type {
 	UsersDiConfig,
 	UsersInjectableDependencies,
 	UsersModuleDependencies,
-	FindBy,
+	InternalFindBy,
+	ExternalFindBy,
 }

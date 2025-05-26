@@ -3,6 +3,7 @@ import type {
 	DbConfig,
 	CacheConfig,
 	MailerConfig,
+	GoogleOAuthConfig,
 } from '@/core/types/index.js'
 import { env } from '@/env.js'
 
@@ -25,10 +26,17 @@ const getMailerConfig = (): MailerConfig => ({
 	apiKey: env.RESEND_API_KEY,
 })
 
+const getGoogleOAuthConfig = (): GoogleOAuthConfig => ({
+	clientId: env.GOOGLE_CLIENT_ID,
+	clientSecret: env.GOOGLE_CLIENT_SECRET,
+	redirectURI: env.GOOGLE_REDIRECT_URI,
+})
+
 const getConfig = (): Config => ({
 	db: getDbConfig(),
 	cache: getCacheConfig(),
 	mailer: getMailerConfig(),
+	googleOAuth: getGoogleOAuthConfig(),
 })
 
 export { getConfig }

@@ -39,15 +39,29 @@ const EDIT_USER_PROFILE_SCHEMA = z.object({
 
 type EDIT_USER_PROFILE_TYPE = z.infer<typeof EDIT_USER_PROFILE_SCHEMA>
 
+const CREATE_EXTERNAL_USER_SCHEMA = z.object({
+	providerId: z.string(),
+	firstName: z.string(),
+	lastName: z.string(),
+	email: z.string().email(),
+	locale: z.string(),
+	avatar: z.string(),
+	provider: z.string(),
+})
+
+type CREATE_EXTERNAL_USER_TYPE = z.infer<typeof CREATE_EXTERNAL_USER_SCHEMA>
+
 export {
 	CREATE_INTERNAL_USER_SCHEMA,
 	CHANGE_LANGUAGE_SCHEMA,
 	MANAGE_PRIVACY_SCHEMA,
 	EDIT_USER_PROFILE_SCHEMA,
+	CREATE_EXTERNAL_USER_SCHEMA,
 }
 export type {
 	CREATE_INTERNAL_USER_TYPE,
 	CHANGE_LANGUAGE_TYPE,
 	MANAGE_PRIVACY_TYPE,
 	EDIT_USER_PROFILE_TYPE,
+	CREATE_EXTERNAL_USER_TYPE,
 }

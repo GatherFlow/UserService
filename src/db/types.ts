@@ -15,6 +15,7 @@ interface UserLanguage {
 }
 
 type InternalUser = User & { email: string; password: string }
+type ExternalUser = User & { email: string }
 
 type PublicUser = Omit<User, 'createdAt' | 'updatedAt'> & {
 	email: string
@@ -30,4 +31,5 @@ export type {
 	UserLanguage,
 	UserPrivacy,
 	PasswordResetSession,
+	ExternalUser,
 }

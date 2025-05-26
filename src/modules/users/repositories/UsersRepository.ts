@@ -1,4 +1,3 @@
-import { DAY } from '@/core/constants/time.js'
 import { Result } from '@/core/lib/result.js'
 import type { Maybe } from '@/core/types/common.js'
 import type { DatabaseClient } from '@/core/types/deps.js'
@@ -11,29 +10,27 @@ import type {
 	ExternalUser,
 	InternalCredentials,
 	InternalUser,
-	Language,
-	PublicUser,
+	Role,
 	User,
-	UserLanguage,
-	UserPrivacy,
 } from '@/db/types.js'
-import { eq, getTableColumns, or } from 'drizzle-orm'
+import { eq, getTableColumns } from 'drizzle-orm'
 import type { Redis } from 'ioredis'
 import type {
 	CREATE_EXTERNAL_USER_TYPE,
 	CREATE_INTERNAL_USER_TYPE,
-	EDIT_USER_PROFILE_TYPE,
-	MANAGE_PRIVACY_TYPE,
 } from '../schemas/index.js'
 import type {
 	ExternalFindBy,
-	InternalFindBy,
 	IUsersRepository,
+	InternalFindBy,
 	UsersInjectableDependencies,
 } from '../types/index.js'
-import { toPublicUser } from '../utils/index.js'
+import { DAY } from '@/core/constants/time.js'
 
 export class UsersRepository implements IUsersRepository {
+	private static readonly SUPERVISOR_PERSISTANCE_KEY: string = 'has-supervisor'
+	private static readonly CACHE_TTL: number = 7 * DAY
+
 	private readonly db: DatabaseClient
 	private readonly cache: Redis
 
@@ -44,46 +41,6 @@ export class UsersRepository implements IUsersRepository {
 
 	async findAll(): Promise<User[]> {
 		return this.db.select().from(userTable)
-	}
-
-	// TODO: Refactor to accept third-party users
-	async getCurrent(id: string): Promise<Maybe<PublicUser>> {
-		const internalUser = await this.findInternalBy('id', id)
-
-		const language = await this.getUserLanguage(id)
-
-		if (!internalUser) {
-			const externalUser = await this.findExternal('id', id)
-
-			if (!externalUser) return null
-
-			return toPublicUser({ ...externalUser, language: language.language })
-		}
-
-		return toPublicUser({ ...internalUser, language: language.language })
-	}
-
-	async getUserPrivacy(id: string): Promise<UserPrivacy> {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { id: privacyId, userId, ...rest } = getTableColumns(userPrivacyTable)
-
-		const privacyRows = await this.db
-			.select({ ...rest })
-			.from(userPrivacyTable)
-			.where(eq(userPrivacyTable.userId, id))
-			.limit(1)
-
-		return privacyRows.at(0)!
-	}
-
-	async getUserLanguage(id: string): Promise<UserLanguage> {
-		const languageRows = await this.db
-			.select({ language: userLanguageTable.code })
-			.from(userLanguageTable)
-			.where(eq(userLanguageTable.userId, id))
-			.limit(1)
-
-		return languageRows.at(0)!
 	}
 
 	async findInternalBy<K extends InternalFindBy>(
@@ -111,7 +68,7 @@ export class UsersRepository implements IUsersRepository {
 		return user ?? null
 	}
 
-	async findExternal<K extends ExternalFindBy>(
+	async findExternalBy<K extends ExternalFindBy>(
 		by: K,
 		value: ExternalUser[K],
 	): Promise<Maybe<ExternalUser>> {
@@ -133,66 +90,15 @@ export class UsersRepository implements IUsersRepository {
 		return user ?? null
 	}
 
-	async isEmailAvailable(email: string): Promise<boolean> {
-		const KEY = `email:${email}`
-
-		const isCached = await this.cache.exists(KEY)
-
-		if (isCached) {
-			return false
-		}
-
-		const result = await this.db
-			.select({ id: userTable.id })
-			.from(userTable)
-			.innerJoin(
-				internalCredentialTable,
-				eq(internalCredentialTable.userId, userTable.id),
-			)
-			.innerJoin(authProviderTable, eq(authProviderTable.userId, userTable.id))
-			.where(
-				or(
-					eq(internalCredentialTable.email, email),
-					eq(authProviderTable.email, email),
-				),
-			)
-			.limit(1)
-
-		await this.cache.setex(KEY, 7 * DAY, 'taken')
-
-		return result.length === 0
-	}
-
-	async isUsernameAvailable(username: string): Promise<boolean> {
-		const KEY = `username:${username}`
-
-		const isCached = await this.cache.exists(KEY)
-
-		if (isCached) {
-			return false
-		}
-
-		const result = await this.db
-			.select({ id: userTable.id })
-			.from(userTable)
-			.where(eq(userTable.username, username))
-			.limit(1)
-
-		await this.cache.setex(KEY, 7 * DAY, 'taken')
-
-		return result.length === 0
-	}
-
 	async createInternal(
 		data: CREATE_INTERNAL_USER_TYPE,
 	): Promise<Result<InternalUser, null>> {
 		try {
 			const { firstName, lastName, email, password, language } = data
-			const KEY = 'has-supervisor'
 
 			const username = email.split('@')[0]!
 
-			const hasSupervisor = await this.cache.exists(KEY)
+			const hasSupervisor = await this.hasSupervisor()
 
 			const result = await this.db.transaction(
 				async (tx) => {
@@ -203,8 +109,8 @@ export class UsersRepository implements IUsersRepository {
 							firstName,
 							lastName,
 							avatar: '/',
-							isVerified: hasSupervisor ? false : true,
-							role: hasSupervisor ? 'user' : 'supervisor',
+							isVerified: !hasSupervisor,
+							role: UsersRepository.setRole(hasSupervisor),
 						})
 						.returning()
 
@@ -235,11 +141,10 @@ export class UsersRepository implements IUsersRepository {
 			)
 
 			if (!hasSupervisor) {
-				await this.cache.set(KEY, 'true')
+				await this.persistSupervisor()
 			}
 
-			await this.cache.setex(`username:${username}`, 7 * DAY, 'taken')
-			await this.cache.setex(`email:${email}`, 7 * DAY, 'taken')
+			await this.persistCredentials(email, username)
 
 			return Result.success(result)
 		} catch {
@@ -252,10 +157,9 @@ export class UsersRepository implements IUsersRepository {
 	): Promise<Result<ExternalUser, null>> {
 		const { locale, firstName, lastName, email, avatar, providerId, provider } =
 			data
-		const KEY = 'has-supervisor'
 		const username = email.split('@')[0]!
 
-		const hasSupervisor = await this.cache.exists(KEY)
+		const hasSupervisor = await this.hasSupervisor()
 
 		try {
 			const result = await this.db.transaction(async (tx) => {
@@ -267,7 +171,7 @@ export class UsersRepository implements IUsersRepository {
 						lastName,
 						avatar,
 						isVerified: true,
-						role: hasSupervisor ? 'user' : 'supervisor',
+						role: UsersRepository.setRole(hasSupervisor),
 					})
 					.returning()
 
@@ -296,11 +200,10 @@ export class UsersRepository implements IUsersRepository {
 			})
 
 			if (!hasSupervisor) {
-				await this.cache.set(KEY, 'true')
+				await this.persistSupervisor()
 			}
 
-			await this.cache.setex(`username:${username}`, 7 * DAY, 'taken')
-			await this.cache.setex(`email:${email}`, 7 * DAY, 'taken')
+			await this.persistCredentials(email, username)
 
 			return Result.success(result)
 		} catch {
@@ -308,44 +211,39 @@ export class UsersRepository implements IUsersRepository {
 		}
 	}
 
-	async changeLanguage(userId: string, language: Language): Promise<void> {
-		await this.db
-			.update(userLanguageTable)
-			.set({ code: language })
-			.where(eq(userLanguageTable.userId, userId))
-	}
-
-	async managePrivacy(
-		userId: string,
-		data: MANAGE_PRIVACY_TYPE,
-	): Promise<void> {
-		await this.db
-			.update(userPrivacyTable)
-			.set({ ...data })
-			.where(eq(userPrivacyTable.userId, userId))
-	}
-
-	async editProfile(
-		userId: string,
-		data: EDIT_USER_PROFILE_TYPE,
-	): Promise<void> {
-		await this.db
-			.update(userTable)
-			.set({ ...data })
-			.where(eq(userTable.id, userId))
-	}
-
-	async verify(userId: string): Promise<void> {
-		await this.db
-			.update(userTable)
-			.set({ isVerified: true })
-			.where(eq(userTable.id, userId))
-	}
-
 	async changePassword(userId: string, password: string): Promise<void> {
 		await this.db
 			.update(internalCredentialTable)
 			.set({ passwordHash: password })
 			.where(eq(internalCredentialTable.userId, userId))
+	}
+
+	private async hasSupervisor(): Promise<boolean> {
+		const has = await this.cache.exists(
+			UsersRepository.SUPERVISOR_PERSISTANCE_KEY,
+		)
+
+		return !!has
+	}
+
+	private async persistCredentials(
+		email: string,
+		username: string,
+	): Promise<void> {
+		await this.cache.setex(
+			`username:${username}`,
+			UsersRepository.CACHE_TTL,
+			'taken',
+		)
+
+		await this.cache.setex(`email:${email}`, UsersRepository.CACHE_TTL, 'taken')
+	}
+
+	private async persistSupervisor(): Promise<void> {
+		await this.cache.set(UsersRepository.SUPERVISOR_PERSISTANCE_KEY, 'true')
+	}
+
+	private static setRole(hasSupervisor: boolean): Role {
+		return hasSupervisor ? 'user' : 'supervisor'
 	}
 }

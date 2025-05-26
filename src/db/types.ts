@@ -3,6 +3,7 @@ import type { passwordResetSessionTable } from './schema/passwordResetSessions.j
 import { userPrivacyTable } from './schema/userPrivacySettings.js'
 import { userTable } from './schema/users.js'
 
+type Role = 'admin' | 'supervisor' | 'user'
 type Language = 'en' | 'uk'
 
 type User = typeof userTable.$inferSelect
@@ -23,13 +24,14 @@ type PublicUser = Omit<User, 'createdAt' | 'updatedAt'> & {
 }
 
 export type {
+	ExternalUser,
 	InternalCredentials,
 	InternalUser,
 	Language,
+	PasswordResetSession,
 	PublicUser,
+	Role,
 	User,
 	UserLanguage,
 	UserPrivacy,
-	PasswordResetSession,
-	ExternalUser,
 }

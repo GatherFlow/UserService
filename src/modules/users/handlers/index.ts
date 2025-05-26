@@ -1,37 +1,25 @@
 import { protectedRoute } from '@/core/guards/index.js'
-import type { FastifyReply, FastifyRequest } from 'fastify'
+import { Problem } from '@/core/lib/problem.js'
+import { throwHttpError } from '@/core/utils/common.js'
+import { UsernameAlreadyUsedError } from '@/modules/auth/errors/username-already-used.js'
 import type {
 	CHANGE_LANGUAGE_TYPE,
 	EDIT_USER_PROFILE_TYPE,
 	MANAGE_PRIVACY_TYPE,
 } from '../schemas/index.js'
-import { Problem } from '@/core/lib/problem.js'
-import { UsernameAlreadyUsedError } from '@/modules/auth/errors/username-already-used.js'
-import { throwHttpError } from '@/core/utils/common.js'
-
-export const getUsers = async (
-	request: FastifyRequest,
-	reply: FastifyReply,
-): Promise<void> => {
-	const { usersRepository } = request.diScope.cradle
-
-	const users = await usersRepository.findAll()
-
-	return reply.status(200).send(users)
-}
 
 export const changeUserLanguage = protectedRoute<{
 	Body: CHANGE_LANGUAGE_TYPE
 }>(async (request, reply) => {
 	const { id } = request.user
 	const { language } = request.body
-	const { usersRepository } = request.diScope.cradle
+	const { profilesRepository } = request.diScope.cradle
 
 	if (request.user.language === language) {
 		return reply.status(204).send()
 	}
 
-	await usersRepository.changeLanguage(id, language)
+	await profilesRepository.changeLanguage(id, language)
 
 	return reply.status(204).send()
 })
@@ -39,9 +27,9 @@ export const changeUserLanguage = protectedRoute<{
 export const manageUserPrivacy = protectedRoute<{ Body: MANAGE_PRIVACY_TYPE }>(
 	async (request, reply) => {
 		const { id } = request.user
-		const { usersRepository } = request.diScope.cradle
+		const { profilesRepository } = request.diScope.cradle
 
-		await usersRepository.managePrivacy(id, request.body)
+		await profilesRepository.managePrivacy(id, request.body)
 
 		return reply.status(204).send()
 	},
@@ -49,9 +37,9 @@ export const manageUserPrivacy = protectedRoute<{ Body: MANAGE_PRIVACY_TYPE }>(
 
 export const getUserPrivacy = protectedRoute(async (request, reply) => {
 	const { id } = request.user
-	const { usersRepository } = request.diScope.cradle
+	const { profilesRepository } = request.diScope.cradle
 
-	const privacy = await usersRepository.getUserPrivacy(id)
+	const privacy = await profilesRepository.getPrivacy(id)
 
 	return reply.status(200).send(privacy)
 })
@@ -59,9 +47,9 @@ export const getUserPrivacy = protectedRoute(async (request, reply) => {
 export const editUserProfile = protectedRoute<{ Body: EDIT_USER_PROFILE_TYPE }>(
 	async (request, reply) => {
 		const { id } = request.user
-		const { usersRepository } = request.diScope.cradle
+		const { profilesRepository, credentialsService } = request.diScope.cradle
 
-		const isUsernameAvailable = await usersRepository.isUsernameAvailable(
+		const isUsernameAvailable = await credentialsService.isUsernameAvailable(
 			request.body.username,
 		)
 
@@ -74,7 +62,7 @@ export const editUserProfile = protectedRoute<{ Body: EDIT_USER_PROFILE_TYPE }>(
 			return throwHttpError(reply, problem)
 		}
 
-		await usersRepository.editProfile(id, request.body)
+		await profilesRepository.editProfile(id, request.body)
 
 		return reply.status(204).send()
 	},

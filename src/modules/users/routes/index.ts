@@ -3,7 +3,6 @@ import {
 	changeUserLanguage,
 	editUserProfile,
 	getUserPrivacy,
-	getUsers,
 	manageUserPrivacy,
 } from '../handlers/index.js'
 import {
@@ -14,11 +13,6 @@ import {
 
 export const getUsersRoutes = (): Routes => ({
 	routes: [
-		{
-			method: 'GET',
-			url: '/users',
-			handler: getUsers,
-		},
 		{
 			method: 'PUT',
 			url: '/users/language',

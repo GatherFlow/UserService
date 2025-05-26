@@ -87,7 +87,7 @@ export const validateGoogleCallback = async (
 	const lastName = claims.family_name
 	const avatar = claims.picture
 
-	const isExist = await usersRepository.findExternal('providerId', googleUserId)
+	const isExist = await usersRepository.findExternalBy('id', googleUserId)
 
 	if (!isExist) {
 		const result = await usersRepository.createExternal({

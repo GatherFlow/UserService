@@ -10,11 +10,14 @@ import { resolveUsersModule } from '@/modules/users/index.js'
 import type { UsersModuleDependencies } from '@/modules/users/types/index.js'
 import type { AwilixContainer, NameAndRegistrationPair } from 'awilix'
 import { resolveCommonDiConfig } from './commonDiConfig.js'
+import type { StatisticModuleDependencies } from '@/modules/statictics/types/index.js'
+import { resolveStatisticsModule } from '@/modules/statictics/index.js'
 
 type Dependencies = CommonDependencies &
 	UsersModuleDependencies &
 	AuthModuleDependencies &
-	AdminModuleDependencies
+	AdminModuleDependencies &
+	StatisticModuleDependencies
 
 type DiConfig = NameAndRegistrationPair<Dependencies>
 
@@ -27,6 +30,7 @@ export const registerDependencies = (
 		...resolveUsersModule(),
 		...resolveAuthModule(),
 		...resolveAdminModule(),
+		...resolveStatisticsModule(),
 	}
 
 	diContainer.register(diConfig)

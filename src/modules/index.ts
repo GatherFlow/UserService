@@ -3,12 +3,14 @@ import { getUsersRoutes } from './users/routes/index.js'
 import { getAuthRoutes } from './auth/routes/index.js'
 import { getOAuthRoutes } from './oauth/routes/index.js'
 import { getAdminRoutes } from './admin/routes/index.js'
+import { getStatisticsRoutes } from './statictics/routes/index.js'
 
 export const getRoutes = (): Routes => {
 	const { routes: usersRoutes } = getUsersRoutes()
 	const { routes: authRoutes } = getAuthRoutes()
 	const { routes: oauthRoutes } = getOAuthRoutes()
 	const { routes: adminRoutes } = getAdminRoutes()
+	const { routes: statisticsRoutes } = getStatisticsRoutes()
 
 	return {
 		routes: [
@@ -29,6 +31,7 @@ export const getRoutes = (): Routes => {
 			...usersRoutes,
 			...oauthRoutes,
 			...adminRoutes,
+			...statisticsRoutes,
 		],
 	}
 }

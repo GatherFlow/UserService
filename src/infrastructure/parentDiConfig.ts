@@ -2,6 +2,8 @@ import type {
 	CommonDependencies,
 	ExternalDependencies,
 } from '@/core/types/deps.js'
+import { resolveAdminModule } from '@/modules/admin/index.js'
+import type { AdminModuleDependencies } from '@/modules/admin/types/index.js'
 import { resolveAuthModule } from '@/modules/auth/index.js'
 import type { AuthModuleDependencies } from '@/modules/auth/types/index.js'
 import { resolveUsersModule } from '@/modules/users/index.js'
@@ -11,7 +13,8 @@ import { resolveCommonDiConfig } from './commonDiConfig.js'
 
 type Dependencies = CommonDependencies &
 	UsersModuleDependencies &
-	AuthModuleDependencies
+	AuthModuleDependencies &
+	AdminModuleDependencies
 
 type DiConfig = NameAndRegistrationPair<Dependencies>
 
@@ -23,6 +26,7 @@ export const registerDependencies = (
 		...resolveCommonDiConfig(dependencies),
 		...resolveUsersModule(),
 		...resolveAuthModule(),
+		...resolveAdminModule(),
 	}
 
 	diContainer.register(diConfig)

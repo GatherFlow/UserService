@@ -88,9 +88,10 @@ export const signup = async (
 		passwordService,
 		cookieService,
 		emailVerificationService,
+		credentialsService,
 	} = request.diScope.cradle
 
-	const isEmailTaken = await usersRepository.isEmailAvailable(email)
+	const isEmailTaken = await credentialsService.isEmailAvailable(email)
 
 	if (!isEmailTaken) {
 		const problem = Problem.withInstance(
@@ -164,7 +165,7 @@ export const me = protectedRoute(async (request, reply) => {
 export const verifyEmail = protectedRoute<{ Body: EMAIL_VERIFICATION_TYPE }>(
 	async (request, reply) => {
 		const { code } = request.body
-		const { emailVerificationService, cookieService, usersRepository } =
+		const { emailVerificationService, cookieService, profilesRepository } =
 			request.diScope.cradle
 
 		const token = request.cookies[EMAIL_VERIFICATION_COOKIE]
@@ -215,7 +216,7 @@ export const verifyEmail = protectedRoute<{ Body: EMAIL_VERIFICATION_TYPE }>(
 		}
 
 		await emailVerificationService.deleteRequest(`${request.user.id}:${token}`)
-		await usersRepository.verify(request.user.id)
+		await profilesRepository.verify(request.user.id)
 		cookieService.deleteEmailVerificationCookie(reply)
 	},
 )

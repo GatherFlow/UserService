@@ -77,12 +77,12 @@ type AuthDiConfig = BaseDiConfig<AuthModuleDependencies>
 
 export type {
 	AuthDiConfig,
+	AuthInjectableDependencies,
 	AuthModuleDependencies,
-	IPasswordService,
+	EmailVerificationRequest,
 	ICookieService,
 	IEmailVerificationService,
-	AuthInjectableDependencies,
-	EmailVerificationRequest,
+	IPasswordService,
 	IResetPasswordService,
 	SetCookieArgs,
 }

@@ -16,12 +16,12 @@ export const protectedRoute = <T extends RouteGenericInterface>(
 	handler: ProtectedHandler<T>,
 ) => {
 	return async (request: FastifyRequest<T>, reply: FastifyReply) => {
-		const { usersRepository } = request.diScope.cradle
+		const { usersService } = request.diScope.cradle
 
 		const payload = await request.jwtVerify()
 
 		// @ts-expect-error payload object doesn't have typization
-		const user = await usersRepository.getCurrent(payload.userId)
+		const user = await usersService.getCurrent(payload.userId)
 
 		if (!user) {
 			const problem = Problem.withInstance(

@@ -21,7 +21,7 @@ type CHANGE_LANGUAGE_TYPE = z.infer<typeof CHANGE_LANGUAGE_SCHEMA>
 
 const MANAGE_PRIVACY_SCHEMA = z
 	.object({
-		isProfile: z.boolean().optional(),
+		isPrivate: z.boolean().optional(),
 		hideOwned: z.boolean().optional(),
 		hidePurchased: z.boolean().optional(),
 		hideAppreciated: z.boolean().optional(),

@@ -1,7 +1,4 @@
 import { protectedRoute } from '@/core/guards/index.js'
-import { Problem } from '@/core/lib/problem.js'
-import { throwHttpError } from '@/core/utils/common.js'
-import { UsernameAlreadyUsedError } from '@/modules/auth/errors/username-already-used.js'
 import type {
 	CHANGE_LANGUAGE_TYPE,
 	EDIT_USER_PROFILE_TYPE,
@@ -47,20 +44,7 @@ export const getUserPrivacy = protectedRoute(async (request, reply) => {
 export const editUserProfile = protectedRoute<{ Body: EDIT_USER_PROFILE_TYPE }>(
 	async (request, reply) => {
 		const { id } = request.user
-		const { profilesRepository, credentialsService } = request.diScope.cradle
-
-		const isUsernameAvailable = await credentialsService.isUsernameAvailable(
-			request.body.username,
-		)
-
-		if (!isUsernameAvailable) {
-			const problem = Problem.withInstance(
-				Problem.from(new UsernameAlreadyUsedError(request.body.username)),
-				request.url,
-			)
-
-			return throwHttpError(reply, problem)
-		}
+		const { profilesRepository } = request.diScope.cradle
 
 		await profilesRepository.editProfile(id, request.body)
 

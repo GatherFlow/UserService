@@ -72,4 +72,8 @@ export class CredentialsService implements ICredentialsService {
 
 		return result.length === 0
 	}
+
+	async invalidate(username: string, email: string): Promise<void> {
+		await this.cache.del(`username:${username}`, `email:${email}`)
+	}
 }

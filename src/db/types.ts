@@ -18,6 +18,19 @@ interface UserLanguage {
 type InternalUser = User & { email: string; password: string }
 type ExternalUser = User & { email: string; providerId: string }
 
+interface AdminUser {
+	id: string
+	firstName: string
+	lastName: string
+	username: string
+	email: string
+	avatar: string
+	bio: string
+	role: Role
+	isVerified: boolean
+	type: 'internal' | 'external'
+}
+
 type PublicUser = Omit<User, 'createdAt' | 'updatedAt'> & {
 	email: string
 	language: string
@@ -34,4 +47,5 @@ export type {
 	User,
 	UserLanguage,
 	UserPrivacy,
+	AdminUser,
 }

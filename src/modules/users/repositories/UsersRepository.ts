@@ -246,4 +246,8 @@ export class UsersRepository implements IUsersRepository {
 	private static setRole(hasSupervisor: boolean): Role {
 		return hasSupervisor ? 'user' : 'supervisor'
 	}
+
+	async deleteUser(id: string): Promise<void> {
+		await this.db.delete(userTable).where(eq(userTable.id, id))
+	}
 }

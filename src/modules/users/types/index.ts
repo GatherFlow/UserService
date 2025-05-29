@@ -39,6 +39,7 @@ interface IUsersRepository {
 		data: CREATE_EXTERNAL_USER_TYPE,
 	) => Promise<Result<ExternalUser, null>>
 	changePassword: (userId: string, password: string) => Promise<void>
+	deleteUser: (id: string) => Promise<void>
 }
 
 interface IProfilesRepository {
@@ -57,6 +58,7 @@ interface IUsersService {
 interface ICredentialsService {
 	isEmailAvailable: (email: string) => Promise<boolean>
 	isUsernameAvailable: (username: string) => Promise<boolean>
+	invalidate: (email: string, username: string) => Promise<void>
 }
 
 interface UsersModuleDependencies {

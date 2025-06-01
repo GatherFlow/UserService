@@ -66,7 +66,7 @@ export class App {
 			}),
 			openapi: {
 				info: {
-					title: 'GatherFlow Backend',
+					title: 'GatherFlow Users Service',
 					description: '',
 					version: '0.0.0',
 				},
@@ -74,7 +74,7 @@ export class App {
 		})
 
 		await this.app.register(fastifySwaggerUi, {
-			routePrefix: '/api',
+			routePrefix: '/users',
 		})
 
 		await this.app.register(fastifyAwilixPlugin, {
@@ -110,10 +110,10 @@ export class App {
 			},
 			sign: {
 				algorithm: 'RS256',
-				iss: 'gather.onelil.tech',
+				iss: 'bots.innova.ua',
 				expiresIn: JWT_EXPIRATION_TIME,
 			},
-			verify: { allowedIss: 'gather.onelil.tech', algorithms: ['RS256'] },
+			verify: { allowedIss: 'bots.innova.ua', algorithms: ['RS256'] },
 		})
 
 		this.app.addHook('preHandler', (request, reply, next) => {
@@ -147,7 +147,7 @@ export class App {
 
 				done()
 			},
-			{ prefix: '/api' },
+			{ prefix: '/users' },
 		)
 	}
 

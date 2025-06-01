@@ -1,0 +1,27 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install
+        run: sudo apt-get install -y sshpass
+
+      - name: Deploy
+        run: |
+          sshpass -p "${{ secrets.SSH_PASS }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.SSH_HOST }} <<EOF
+            cd ./services/${{ github.event.repository.name }}
+            git reset --hard
+            git pull origin main
+            docker compose down --volumes
+            docker compose up -d --build
+          EOF

@@ -74,7 +74,7 @@ export class App {
 		})
 
 		await this.app.register(fastifySwaggerUi, {
-			routePrefix: '/users',
+			routePrefix: '/',
 		})
 
 		await this.app.register(fastifyAwilixPlugin, {
@@ -139,16 +139,9 @@ export class App {
 	private registerRoutes(): void {
 		const { routes } = getRoutes()
 
-		this.app.register(
-			(instance, _, done) => {
-				for (const route of routes) {
-					instance.withTypeProvider<ZodTypeProvider>().route(route)
-				}
-
-				done()
-			},
-			{ prefix: '/users' },
-		)
+		for (const route of routes) {
+			this.app.withTypeProvider<ZodTypeProvider>().route(route)
+		}
 	}
 
 	async initialize(): Promise<AppInstance> {

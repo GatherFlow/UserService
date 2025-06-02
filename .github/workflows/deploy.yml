@@ -22,6 +22,6 @@ jobs:
             cd ./services/${{ github.event.repository.name }}
             git reset --hard
             git pull origin main
-            docker compose down --volumes
+            docker compose down
             docker compose up -d --build
           EOF

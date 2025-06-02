@@ -110,10 +110,9 @@ export class App {
 			},
 			sign: {
 				algorithm: 'RS256',
-				iss: 'bots.innova.ua',
 				expiresIn: JWT_EXPIRATION_TIME,
 			},
-			verify: { allowedIss: 'bots.innova.ua', algorithms: ['RS256'] },
+			verify: { algorithms: ['RS256'] },
 		})
 
 		this.app.addHook('preHandler', (request, reply, next) => {

@@ -52,7 +52,7 @@ const CREATE_EXTERNAL_USER_SCHEMA = z.object({
 type CREATE_EXTERNAL_USER_TYPE = z.infer<typeof CREATE_EXTERNAL_USER_SCHEMA>
 
 const GET_MANY_USERS_SCHEMA = z.object({
-	ids: z.string().array(),
+	ids: z.string(),
 })
 
 type GET_MANY_USERS_TYPE = z.infer<typeof GET_MANY_USERS_SCHEMA>

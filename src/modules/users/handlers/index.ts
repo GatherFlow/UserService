@@ -59,7 +59,9 @@ export const getManyUsers = protectedRoute<{
 	const { ids } = request.query
 	const { usersRepository } = request.diScope.cradle
 
-	const users = await usersRepository.findManyById(ids)
+	const list = ids.split(',')
+
+	const users = await usersRepository.findManyById(list)
 
 	return reply.status(200).send(users)
 })

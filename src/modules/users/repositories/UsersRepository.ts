@@ -7,13 +7,14 @@ import { userLanguageTable } from '@/db/schema/userLanguages.js'
 import { userPrivacyTable } from '@/db/schema/userPrivacySettings.js'
 import { userTable } from '@/db/schema/users.js'
 import type {
+	BaseUser,
 	ExternalUser,
 	InternalCredentials,
 	InternalUser,
 	Role,
 	User,
 } from '@/db/types.js'
-import { eq, getTableColumns } from 'drizzle-orm'
+import { eq, getTableColumns, inArray } from 'drizzle-orm'
 import type { Redis } from 'ioredis'
 import type {
 	CREATE_EXTERNAL_USER_TYPE,
@@ -88,6 +89,19 @@ export class UsersRepository implements IUsersRepository {
 			)
 
 		return user ?? null
+	}
+
+	async findManyById(ids: string[]): Promise<BaseUser[]> {
+		return this.db
+			.select({
+				id: userTable.id,
+				firstName: userTable.firstName,
+				lastName: userTable.lastName,
+				username: userTable.username,
+				avatar: userTable.avatar,
+			})
+			.from(userTable)
+			.where(inArray(userTable.id, ids))
 	}
 
 	async createInternal(

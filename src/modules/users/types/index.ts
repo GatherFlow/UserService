@@ -2,6 +2,7 @@ import type { Result } from '@/core/lib/result.js'
 import type { BaseDiConfig, InjectableDependencies } from '@/core/types/deps.js'
 import type { Maybe } from '@/core/types/index.js'
 import type {
+	BaseUser,
 	ExternalUser,
 	InternalCredentials,
 	InternalUser,
@@ -32,6 +33,7 @@ interface IUsersRepository {
 		by: K,
 		value: ExternalUser[K],
 	) => Promise<Maybe<ExternalUser>>
+	findManyById: (ids: string[]) => Promise<BaseUser[]>
 	createInternal: (
 		data: CREATE_INTERNAL_USER_TYPE,
 	) => Promise<Result<InternalUser, null>>

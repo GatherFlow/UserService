@@ -2,6 +2,7 @@ import { protectedRoute } from '@/core/guards/index.js'
 import type {
 	CHANGE_LANGUAGE_TYPE,
 	EDIT_USER_PROFILE_TYPE,
+	GET_MANY_USERS_TYPE,
 	MANAGE_PRIVACY_TYPE,
 } from '../schemas/index.js'
 
@@ -51,3 +52,14 @@ export const editUserProfile = protectedRoute<{ Body: EDIT_USER_PROFILE_TYPE }>(
 		return reply.status(204).send()
 	},
 )
+
+export const getManyUsers = protectedRoute<{
+	Querystring: GET_MANY_USERS_TYPE
+}>(async (request, reply) => {
+	const { ids } = request.query
+	const { usersRepository } = request.diScope.cradle
+
+	const users = await usersRepository.findManyById(ids)
+
+	return reply.status(200).send(users)
+})

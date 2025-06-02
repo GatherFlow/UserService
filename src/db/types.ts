@@ -15,6 +15,14 @@ interface UserLanguage {
 	language: string
 }
 
+interface BaseUser {
+	id: string
+	firstName: string
+	lastName: string
+	username: string
+	avatar: string
+}
+
 type InternalUser = User & { email: string; password: string }
 type ExternalUser = User & { email: string; providerId: string }
 
@@ -48,4 +56,5 @@ export type {
 	UserLanguage,
 	UserPrivacy,
 	AdminUser,
+	BaseUser,
 }
